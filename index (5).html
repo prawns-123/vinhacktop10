@@ -1,0 +1,2941 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>STUDY GARDEN: Focus & Wellbeing Dashboard</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <style>
+    .tutor-md .katex-display { overflow-x: auto; overflow-y: hidden; margin: 0.5em 0; }
+    .tutor-md .katex { font-size: 1.05em; }
+    .tutor-code { background: #faf3e9; border: 1px solid #e2d9c6; border-radius: 8px; padding: 8px 10px; margin-bottom: 8px; overflow-x: auto; font-family: 'JetBrains Mono', monospace; font-size: 11px; white-space: pre; }
+    .tutor-inline-code { background: #faf3e9; border: 1px solid #e2d9c6; border-radius: 4px; padding: 0 4px; font-family: 'JetBrains Mono', monospace; font-size: 11px; }
+  </style>
+  <!-- FontAwesome & Google Fonts -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            court: {
+              lawn: '#778673', deep: '#2f3a2d', dark: '#5f6e5b', mid: '#8a9a86',
+              light: '#a5bda1', soft: '#c7d2c1', tint: '#faf3e9', surface: '#fdf6ec',
+              border: '#efe5d5', line: '#e2d9c6', accent: '#d57d57'
+            }
+          },
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace']
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    body { background-color: #fdf6ec; color: #2f3a2d; font-family: 'Plus Jakarta Sans', sans-serif; }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #faf3e9; }
+    ::-webkit-scrollbar-thumb { background: #e2d9c6; border-radius: 4px; }
+    .tennis-card { background-color: #ffffff; border: 1px solid #efe5d5; border-radius: 16px; box-shadow: 0 4px 20px -2px rgba(95,110,91,0.07); transition: all 0.2s ease; border-top: 3px solid #778673; }
+    .tennis-card:hover { border-color: #e2d9c6; box-shadow: 0 8px 24px -4px rgba(95,110,91,0.10); }
+    .sticky-col { position: sticky; left: 0; z-index: 20; }
+    .sticky-row { position: sticky; top: 0; z-index: 30; }
+    .sticky-corner { position: sticky; top: 0; left: 0; z-index: 40; }
+    .matrix-micro .matrix-cell { width: 22px; height: 20px; font-size: 8.5px; }
+    .matrix-standard .matrix-cell { width: 32px; height: 26px; font-size: 10px; }
+    .matrix-comfort .matrix-cell { width: 42px; height: 32px; font-size: 11.5px; }
+    .gauge-arc-path { transition: stroke-dashoffset 0.4s cubic-bezier(0.4, 0, 0.2, 1), stroke 0.3s ease; }
+    .focus-guard-locked { pointer-events: none; filter: grayscale(0.95); opacity: 0.42; user-select: none; cursor: not-allowed; transition: all 0.4s ease; }
+    .focus-guard-unlocked { pointer-events: auto; filter: none; opacity: 1; transition: all 0.4s ease; }
+    #gardenToast { pointer-events: none !important; }
+    #gardenToast button { pointer-events: auto; }
+    #gardenToast.opacity-0 button { pointer-events: none; }
+    .sticky-col-right { position: sticky; right: 0; z-index: 20; }
+    .court-grid-pattern { background-size: 36px 36px; background-image: linear-gradient(to right, rgba(119,134,115,0.05) 1px, transparent 1px), linear-gradient(to bottom, rgba(119,134,115,0.05) 1px, transparent 1px); }
+  </style>
+</head>
+<body class="court-grid-pattern min-h-screen flex flex-col antialiased text-court-deep selection:bg-court-soft selection:text-court-deep">
+
+  <!-- ==================== HEADER WITH D-DAY BAR ==================== -->
+  <header class="bg-white border-b border-court-border sticky top-0 z-40 px-4 sm:px-8 py-3 shadow-xs">
+    <div class="max-w-[1720px] mx-auto flex flex-wrap items-center justify-between gap-4">
+      <div class="flex items-center gap-3.5">
+        <div class="w-10 h-10 rounded-xl bg-court-lawn border-2 border-court-light flex items-center justify-center text-white shadow-xs">
+          <i class="fa-solid fa-leaf text-court-accent text-lg"></i>
+        </div>
+        <div>
+          <div class="flex items-center gap-2.5">
+            <h1 class="text-base sm:text-lg font-extrabold text-court-deep tracking-tight">
+              STUDY GARDEN: <span class="text-court-dark font-bold">Focus & Wellbeing</span>
+            </h1>
+            <span class="hidden md:inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-court-tint text-court-lawn border border-court-line">
+              <span class="w-2 h-2 rounded-full bg-court-light animate-ping"></span>
+              SURVEILLANCE ACTIVE
+            </span>
+          </div>
+          <p class="text-xs text-court-dark/70 font-medium">Minimalist AI Mental Health & Study Surveillance</p>
+        </div>
+      </div>
+
+      <!-- Feature: D-Day Exam Counters in Header -->
+      <div class="hidden xl:flex items-center gap-2 bg-court-tint/70 border border-court-line px-3 py-1.5 rounded-xl text-xs font-mono">
+        <i class="fa-solid fa-flag-checkered text-court-lawn mr-1"></i>
+        <span class="font-bold text-court-dark">D-DAY:</span>
+        <div id="ddayBadgeContainer" class="flex items-center gap-2"></div>
+        <button onclick="promptAddDDay()" class="text-[10px] px-1.5 py-0.5 rounded bg-court-lawn text-white hover:bg-court-dark font-bold" title="Add Target Exam D-Day">+</button>
+      </div>
+
+      <!-- Action Controls -->
+      <div class="flex items-center gap-2.5">
+        <button onclick="toggleDeskMode()" class="px-3 py-1.5 rounded-xl bg-court-deep hover:bg-court-lawn text-court-accent border border-court-lawn transition text-xs font-bold flex items-center gap-1.5 shadow-xs" title="Full-Screen Minimalist Desk Mode">
+          <i class="fa-solid fa-expand"></i>
+          <span>Desk Mode</span>
+        </button>
+        <button onclick="openGeminiModal()" class="px-3 py-1.5 rounded-xl bg-court-tint border border-court-line hover:bg-court-line/40 text-court-lawn transition text-xs font-bold flex items-center gap-1.5">
+          <i class="fa-solid fa-wand-magic-sparkles text-court-accent"></i>
+          <span class="hidden sm:inline">Gemini Vision</span>
+        </button>
+        <button onclick="calibrateBaselinePose()" class="px-3 py-1.5 rounded-xl bg-court-lawn hover:bg-court-dark text-white shadow-xs transition text-xs font-semibold flex items-center gap-1.5">
+          <i class="fa-solid fa-crosshairs text-court-accent"></i>
+          <span class="hidden sm:inline">Calibrate</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ==================== 24-HOUR DAILY TIMELINE TRACK & MOTTO ==================== -->
+  <section class="max-w-[1720px] w-full mx-auto px-4 sm:px-8 pt-4">
+    <!-- Motivational Motto Banner -->
+    <div class="flex items-center justify-between bg-court-tint border border-court-line rounded-xl px-4 py-2 text-xs mb-3">
+      <div class="flex items-center gap-2 text-court-dark font-medium truncate">
+        <i class="fa-solid fa-quote-left text-court-lawn"></i>
+        <span id="dailyMottoText" class="italic truncate">"Focus on the step in front of you, not the whole staircase."</span>
+      </div>
+      <button onclick="editDailyMotto()" class="text-[10px] text-court-lawn hover:underline font-mono font-bold shrink-0 ml-2">Edit Motto</button>
+    </div>
+
+    <!-- Timeline Bar -->
+    <div class="bg-white border border-court-border rounded-xl p-3 shadow-xs">
+      <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
+        <div class="flex items-center gap-2">
+          <span class="text-xs font-bold text-court-deep flex items-center gap-1.5 font-mono">
+            <i class="fa-solid fa-chart-gantt text-court-dark"></i>
+            24-HOUR STUDY TIMELINE (TODAY)
+          </span>
+          <span class="text-[10px] text-court-dark/70 font-mono">144 × 10-minute focus blocks</span>
+        </div>
+        <div class="flex items-center gap-3 text-[11px] font-mono">
+          <span>Today Studied: <strong id="TodayTimelineSum" class="text-court-lawn font-black">0m</strong></span>
+          <span>Goal: <strong id="GoalTargetText" class="text-court-dark">6.0h</strong> <button onclick="promptEditStudyGoal()" class="text-[10px] text-court-lawn hover:underline font-mono font-bold ml-0.5" title="Change daily study goal">(Edit)</button></span>
+          <span class="px-2 py-0.5 rounded bg-court-tint text-court-lawn font-bold border border-court-line">🔥 14-Day Streak</span>
+        </div>
+      </div>
+      <div class="overflow-x-auto pb-1">
+        <div class="min-w-[760px]">
+          <div id="TimelineBlocks" class="grid grid-cols-144 gap-[1.5px] h-4 bg-court-surface rounded border border-court-border p-0.5" style="display: grid; grid-template-columns: repeat(144, minmax(0, 1fr));">
+            <!-- 144 Blocks generated by JS -->
+          </div>
+          <div class="flex justify-between text-[9px] text-court-dark/60 font-mono mt-1 px-0.5">
+            <span>00:00</span><span>03:00</span><span>06:00</span><span>09:00</span><span>12:00</span><span>15:00</span><span>18:00</span><span>21:00</span><span>24:00</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Subject Distribution Mini-Bar -->
+      <div class="mt-3 pt-2.5 border-t border-court-border/70 flex items-center justify-between flex-wrap gap-2 text-[10px] font-mono">
+        <span class="font-bold text-court-dark">Today's Subject Distribution:</span>
+        <div class="flex items-center gap-3 flex-wrap" id="SubjectDistBadges"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== MAIN DASHBOARD BODY ==================== -->
+  <main class="flex-1 p-4 sm:p-6 lg:p-8 max-w-[1720px] w-full mx-auto space-y-6">
+
+    <!-- ==================== TOP ROW UI ==================== -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+      <!-- 1. AI SURVEILLANCE FEED (Upper Left - 4 Cols) -->
+      <section class="lg:col-span-4 tennis-card p-5 flex flex-col justify-between">
+        <div>
+          <div class="flex items-center justify-between pb-3.5 mb-3 border-b border-court-border">
+            <div class="flex items-center gap-2">
+              <span class="w-7 h-7 rounded-lg bg-court-tint flex items-center justify-center text-court-dark text-xs border border-court-line">
+                <i class="fa-solid fa-video"></i>
+              </span>
+              <div>
+                <h2 class="font-bold text-sm text-court-deep">AI Surveillance Feed</h2>
+                <span class="text-[10px] text-court-dark/70 font-mono">Real-time Gaze & Distraction Detection</span>
+              </div>
+            </div>
+            <span class="text-[10px] font-mono px-2.5 py-0.5 rounded-md bg-court-lawn text-court-accent border border-court-dark font-extrabold tracking-wider animate-pulse">
+              GAZE TRACKING
+            </span>
+          </div>
+
+          <div class="relative w-full aspect-video rounded-xl bg-court-deep overflow-hidden border-2 border-court-lawn shadow-inner flex items-center justify-center">
+            <video id="webcamElement" class="w-full h-full object-cover hidden" autoplay playsinline muted></video>
+            <canvas id="surveillanceCanvas" class="w-full h-full object-cover"></canvas>
+
+            <!-- Video Status Indicator -->
+            <div id="cameraStatusIndicator" class="absolute top-2.5 right-2.5 px-2 py-0.5 rounded bg-black/60 backdrop-blur-xs text-[10px] font-mono text-white flex items-center gap-1.5 border border-white/20 z-10">
+              <span id="cameraStatusDot" class="w-1.5 h-1.5 rounded-full bg-court-accent"></span>
+              <span id="cameraStatusText">SIMULATED FEED</span>
+            </div>
+
+            <!-- DYNAMIC ABSENCE & PHONE ALERT OVERLAY -->
+            <div id="absenceAlertBanner" class="hidden absolute inset-0 bg-red-950/85 backdrop-blur-xs flex flex-col items-center justify-center text-white p-4 text-center z-30">
+              <i class="fa-solid fa-triangle-exclamation text-red-400 text-3xl mb-2 animate-bounce"></i>
+              <h3 class="font-bold text-sm text-red-200" id="absenceBannerTitle">ALERT: USER AWAY FROM DESK</h3>
+              <p class="text-[11px] text-red-300/90 font-mono mt-1" id="absenceBannerDesc">No human face detected. Attention score penalized to 0%.</p>
+            </div>
+
+            <div id="phoneAlertBanner" class="hidden absolute bottom-12 left-2 right-2 bg-amber-500/90 backdrop-blur-xs rounded-lg p-2 text-white text-center z-20 shadow-md">
+              <div class="text-xs font-bold flex items-center justify-center gap-1.5">
+                <i class="fa-solid fa-circle-exclamation animate-pulse"></i>
+                <span>DISTRACTION</span>
+              </div>
+            </div>
+
+            <!-- Active HUD Overlays -->
+            <div class="absolute top-2.5 left-2.5 flex flex-col gap-1.5 text-[10px] font-mono z-10">
+              <div id="overlayGazeBadge" class="bg-white/95 backdrop-blur-md px-2.5 py-1 rounded-md border border-court-line text-court-deep font-bold shadow-xs flex items-center gap-1.5">
+                <i class="fa-solid fa-crosshairs text-court-dark" id="overlayGazeIcon"></i>
+                <span id="overlayGazeText">Gaze: Focused</span>
+              </div>
+              <div id="overlayPostureBadge" class="bg-white/95 backdrop-blur-md px-2.5 py-1 rounded-md border border-court-line text-court-deep font-bold shadow-xs flex items-center gap-1.5">
+                <i class="fa-solid fa-person-arrow-up-from-line text-court-dark"></i>
+                <span id="overlayPostureText">Posture: Upright</span>
+              </div>
+            </div>
+
+            <!-- Bottom Video Overlay -->
+            <div class="absolute bottom-2.5 left-2.5 right-2.5 bg-white/95 backdrop-blur-md p-2.5 rounded-lg border border-court-line shadow-xs z-10">
+              <div class="flex items-center justify-between text-[10px] font-mono font-bold text-court-deep mb-1">
+                <span class="flex items-center gap-1.5"><i class="fa-solid fa-eye text-court-dark"></i><span>Blink Rate & Fatigue</span></span>
+                <span id="overlayFatigueText" class="text-court-dark font-extrabold">Blink Rate & Fatigue Optimal</span>
+              </div>
+              <div class="w-full bg-court-tint rounded-full h-1.5 overflow-hidden border border-court-border">
+                <div id="fatigueMeterBar" class="bg-court-dark h-full rounded-full transition-all duration-300" style="width: 92%;"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-4 grid grid-cols-2 gap-2.5">
+          <button id="cameraToggleBtn" onclick="toggleRealCameraStream()" class="py-2.5 px-3 rounded-xl bg-court-lawn hover:bg-court-dark text-white text-xs font-bold transition flex items-center justify-center gap-2 shadow-xs">
+            <i class="fa-solid fa-camera" id="cameraToggleIcon"></i>
+            <span id="cameraToggleLabel">Enable Live Camera</span>
+          </button>
+          <button onclick="runGeminiPostureAudit()" class="py-2.5 px-3 rounded-xl bg-court-tint hover:bg-court-line/40 text-court-lawn text-xs font-bold border border-court-line transition flex items-center justify-center gap-2">
+            <i class="fa-solid fa-wand-magic-sparkles text-court-dark"></i>
+            <span>Gemini AI Audit</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- 2. ATTENTION SCORE GAUGE (Center Left - 4 Cols) -->
+      <section class="lg:col-span-4 tennis-card p-5 flex flex-col justify-between">
+        <div>
+          <div class="flex items-center justify-between pb-3 mb-2 border-b border-court-border">
+            <div class="flex items-center gap-2">
+              <span class="w-7 h-7 rounded-lg bg-court-tint flex items-center justify-center text-court-dark text-xs border border-court-line">
+                <i class="fa-solid fa-gauge-high"></i>
+              </span>
+              <div>
+                <h2 class="font-bold text-sm text-court-deep">Attention Score Gauge</h2>
+                <span class="text-[10px] text-court-dark/70 font-mono">Dynamic Real-Time Telemetry</span>
+              </div>
+            </div>
+            <span id="attentionClassificationBadge" class="text-[11px] font-mono font-bold px-2.5 py-0.5 rounded-full bg-court-tint text-court-lawn border border-court-line">
+              HIGH FOCUS
+            </span>
+          </div>
+
+          <div class="flex flex-col items-center justify-center relative py-1">
+            <div class="relative w-48 h-28 flex items-center justify-center">
+              <svg class="w-48 h-28" viewBox="0 0 120 70">
+                <path d="M 15 60 A 45 45 0 0 1 105 60" fill="none" stroke="#efe5d5" stroke-width="10" stroke-linecap="round"/>
+                <path id="gaugeArcFill" class="gauge-arc-path" d="M 15 60 A 45 45 0 0 1 105 60" fill="none" stroke="#778673" stroke-width="10" stroke-linecap="round" stroke-dasharray="141.37" stroke-dashoffset="17"/>
+              </svg>
+              <div class="absolute bottom-1 text-center">
+                <div class="flex items-baseline justify-center gap-1 font-mono">
+                  <span id="attentionScoreNumber" class="text-4xl font-extrabold text-court-deep tracking-tight">88</span>
+                  <span class="text-xs text-court-dark/70 font-bold">/ 100</span>
+                </div>
+                <div id="attentionScoreFullText" class="text-[11px] font-extrabold font-mono text-court-dark uppercase tracking-wider">
+                  88 / 100 - HIGH FOCUS
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 4 Real-time Tracking Factors -->
+          <div class="space-y-2.5 mt-2 bg-court-tint/50 p-3 rounded-xl border border-court-border">
+            <div>
+              <div class="flex justify-between items-center text-[11px] font-semibold mb-1">
+                <span class="text-court-deep flex items-center gap-1.5"><i class="fa-solid fa-eye text-court-dark w-4 text-center"></i>Gaze Direction</span>
+                <span id="gazeFactorValue" class="font-mono text-court-dark font-extrabold">94%</span>
+              </div>
+              <div class="w-full bg-white rounded-full h-1.5 overflow-hidden border border-court-border">
+                <div id="gazeFactorBar" class="bg-court-dark h-full rounded-full transition-all duration-300" style="width: 94%;"></div>
+              </div>
+            </div>
+            <div>
+              <div class="flex justify-between items-center text-[11px] font-semibold mb-1">
+                <span class="text-court-deep flex items-center gap-1.5"><i class="fa-solid fa-person text-court-dark w-4 text-center"></i>Posture Alignment</span>
+                <span id="postureFactorValue" class="font-mono text-court-dark font-extrabold">89%</span>
+              </div>
+              <div class="w-full bg-white rounded-full h-1.5 overflow-hidden border border-court-border">
+                <div id="postureFactorBar" class="bg-court-mid h-full rounded-full transition-all duration-300" style="width: 89%;"></div>
+              </div>
+            </div>
+            <div>
+              <div class="flex justify-between items-center text-[11px] font-semibold mb-1">
+                <span class="text-court-deep flex items-center gap-1.5"><i class="fa-solid fa-bed text-court-dark w-4 text-center"></i>Drowsiness & Blink</span>
+                <span id="drowsinessFactorValue" class="font-mono text-court-dark font-extrabold">91%</span>
+              </div>
+              <div class="w-full bg-white rounded-full h-1.5 overflow-hidden border border-court-border">
+                <div id="drowsinessFactorBar" class="bg-court-light h-full rounded-full transition-all duration-300" style="width: 91%;"></div>
+              </div>
+            </div>
+            <div>
+              <div class="flex justify-between items-center text-[11px] font-semibold mb-1">
+                <span class="text-court-deep flex items-center gap-1.5"><i class="fa-solid fa-window-restore text-court-dark w-4 text-center"></i>App & Screen Switching</span>
+                <span id="switchingFactorValue" class="font-mono text-court-dark font-extrabold">98%</span>
+              </div>
+              <div class="w-full bg-white rounded-full h-1.5 overflow-hidden border border-court-border">
+                <div id="switchingFactorBar" class="bg-court-accent h-full rounded-full transition-all duration-300" style="width: 98%;"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="mt-3 flex items-center justify-between text-[11px] text-court-dark/70 font-mono">
+          <span id="presenceStatusText" class="text-court-lawn font-bold">State: Focused on Screen</span>
+          <span>Response: 150ms</span>
+        </div>
+      </section>
+
+      <!-- 3. STUDY TIMER & SUBJECT SELECTOR (Center Right - 4 Cols) -->
+      <section class="lg:col-span-4 tennis-card p-5 flex flex-col justify-between">
+        <div>
+          <div class="flex items-center justify-between pb-3 mb-2 border-b border-court-border">
+            <div class="flex items-center gap-2">
+              <span class="w-7 h-7 rounded-lg bg-court-tint flex items-center justify-center text-court-dark text-xs border border-court-line">
+                <i class="fa-solid fa-stopwatch"></i>
+              </span>
+              <h2 class="font-bold text-sm text-court-deep">Study Timer & Break</h2>
+            </div>
+            <div class="flex p-1 bg-court-tint border border-court-line rounded-xl">
+              <button onclick="setTimerMode('focus')" id="btnModeFocus" class="px-3 py-1 rounded-lg text-xs font-bold bg-court-lawn text-white shadow-xs transition">Focus</button>
+              <button onclick="setTimerMode('break')" id="btnModeBreak" class="px-3 py-1 rounded-lg text-xs font-bold text-court-dark hover:text-court-lawn transition">Break</button>
+            </div>
+          </div>
+
+          <!-- Subject Pills -->
+          <div class="mb-2">
+            <div class="text-[10px] font-mono text-court-dark/70 uppercase font-bold mb-1 flex items-center justify-between">
+              <span> Active Subject:</span>
+              <span id="activeSubjectLabel" class="font-extrabold text-court-lawn">📐 Mathematics</span>
+            </div>
+            <div class="flex gap-1.5 overflow-x-auto pb-1" id="subjectPills"></div>
+          </div>
+
+          <!-- Countdown Clock -->
+          <div class="text-center py-1 relative">
+            <div class="flex items-center justify-center gap-2 mb-1">
+              <span id="sessionStatusDot" class="w-2 h-2 rounded-full bg-court-light animate-pulse"></span>
+              <span id="sessionStatusLabel" class="text-[10px] font-mono font-extrabold tracking-wider text-court-dark">READY TO FOCUS</span>
+            </div>
+            <div id="timerDisplayDigits" class="text-5xl sm:text-6xl font-black font-mono text-court-deep tracking-wider">00:00</div>
+            <p id="timerStatusDescription" class="text-xs text-court-dark/80 font-medium mt-0.5">Study clock • Resets each hour • Heatmap by date & time</p>
+          </div>
+
+          <!-- MANDATORY: Total Paused in light green -->
+          <div class="mt-2.5 p-3 rounded-xl bg-court-deep border-2 border-court-lawn text-center shadow-xs">
+            <div class="text-[10px] font-mono font-bold uppercase tracking-wider text-court-line mb-0.5 flex items-center justify-center gap-1.5">
+              <i class="fa-solid fa-circle-pause text-court-light"></i>
+              <span>Total Paused / Break Time Taken</span>
+            </div>
+            <div id="pausedBreakTimeDisplay" class="text-xl font-black font-mono text-court-light tracking-wide drop-shadow-sm">00m 00s</div>
+          </div>
+        </div>
+
+        <div class="mt-3 space-y-2">
+          <div class="grid grid-cols-12 gap-2">
+            <button id="timerToggleActionBtn" onclick="toggleTimerRunningState()" class="col-span-8 py-2 px-3 rounded-xl bg-court-lawn hover:bg-court-dark text-white font-extrabold text-xs shadow-xs transition flex items-center justify-center gap-2">
+              <i class="fa-solid fa-play text-court-accent" id="timerActionIcon"></i>
+              <span id="timerActionLabel">Start Focus Session</span>
+            </button>
+            <button onclick="triggerImmediateBreak()" class="col-span-4 py-2 px-3 rounded-xl bg-court-tint hover:bg-court-line/40 text-court-lawn border border-court-line font-bold text-xs transition flex items-center justify-center gap-1.5">
+              <i class="fa-solid fa-mug-saucer text-court-dark"></i>
+              <span>Break</span>
+            </button>
+          </div>
+          <div class="flex items-center justify-between text-[11px] text-court-dark/80 font-mono">
+            <span>Continuous: <strong id="continuousFocusLabel" class="text-court-lawn">0m 00s</strong></span>
+            <button onclick="resetTimerSession(true)" class="text-court-dark hover:text-red-600 font-bold transition flex items-center gap-1">
+              <i class="fa-solid fa-rotate-right"></i>
+              <span>Reset</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+    </div>
+
+    <!-- ==================== STUDY PLANNER (TO-DO CHECKLIST) ==================== -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+      <!-- Study Checklist (7 Cols) -->
+      <section class="lg:col-span-12 tennis-card p-5">
+        <div class="flex items-center justify-between pb-3 mb-3 border-b border-court-border">
+          <div class="flex items-center gap-2">
+            <span class="w-7 h-7 rounded-lg bg-court-tint flex items-center justify-center text-court-dark text-xs border border-court-line">
+              <i class="fa-solid fa-list-check"></i>
+            </span>
+            <h3 class="font-bold text-sm text-court-deep">Study Planner & To-Do Checklist</h3>
+          </div>
+          <span id="taskProgressBadge" class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-court-tint text-court-lawn font-bold border border-court-line">
+            Progress: 1/3 (33%)
+          </span>
+        </div>
+
+        <!-- Add Task Input -->
+        <form onsubmit="event.preventDefault(); addStudyTask();" class="flex gap-2 mb-3.5">
+          <select id="newTaskSubjectSelect" class="bg-court-surface border border-court-border rounded-xl px-2.5 py-1.5 text-xs text-court-deep font-mono focus:outline-none"></select>
+          <input type="text" id="newTaskTitleInput" placeholder="Add study task (e.g. Solve 15 Calculus Problems)..." class="flex-1 bg-white border border-court-border rounded-xl px-3 py-1.5 text-xs text-court-deep placeholder-court-dark/40 focus:outline-none focus:border-court-lawn">
+          <button type="submit" class="px-3.5 py-1.5 bg-court-lawn hover:bg-court-dark text-white font-bold text-xs rounded-xl shadow-xs transition flex items-center gap-1">
+            <i class="fa-solid fa-plus"></i><span>Add</span>
+          </button>
+        </form>
+
+        <!-- Tasks List -->
+        <div id="taskListContainer" class="space-y-2 max-h-[170px] overflow-y-auto pr-1">
+          <!-- Rendered by JS -->
+        </div>
+      </section>
+
+    </div>
+
+    <!-- ==================== 30x24 MATRIX & ANALYTICS ==================== -->
+    <section class="tennis-card p-5 sm:p-6">
+      <div class="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-court-border">
+        <div>
+          <div class="flex items-center gap-2.5">
+            <span class="w-8 h-8 rounded-lg bg-court-lawn text-white flex items-center justify-center text-sm">
+              <i class="fa-solid fa-calendar-days text-court-accent"></i>
+            </span>
+            <h2 class="font-extrabold text-base sm:text-lg text-court-deep tracking-tight">
+              30-Day Hourly Study Engagement Matrix (30 × 24 Grid)
+            </h2>
+          </div>
+          <p class="text-xs text-court-dark/70 font-medium mt-1">
+            X-Axis: Days 1 through 30 • Y-Axis: Hours 00:00 to 23:00 • Real-time binding accumulates active study minutes into today's cell, split by subject. Switch tabs above to view overall or per-subject study time.
+          </p>
+        </div>
+
+        <div class="flex items-center gap-2.5 flex-wrap">
+          <div class="flex items-center bg-court-tint border border-court-line rounded-xl p-1 text-xs">
+            <span class="text-court-dark/80 px-2 text-[11px] font-bold">Cell Size:</span>
+            <button onclick="setMatrixCellSize('micro')" id="sizeBtnMicro" class="px-2.5 py-1 rounded-lg text-court-dark hover:text-court-lawn font-medium text-[11px] transition">Micro</button>
+            <button onclick="setMatrixCellSize('standard')" id="sizeBtnStandard" class="px-2.5 py-1 rounded-lg bg-court-lawn text-white font-bold text-[11px] transition shadow-xs">Standard</button>
+            <button onclick="setMatrixCellSize('comfort')" id="sizeBtnComfort" class="px-2.5 py-1 rounded-lg text-court-dark hover:text-court-lawn font-medium text-[11px] transition">Comfort</button>
+          </div>
+          <button onclick="simulateFullMonthData()" class="px-3 py-1.5 bg-court-tint hover:bg-court-line/50 text-court-lawn border border-court-line rounded-xl text-xs font-bold transition flex items-center gap-1.5">
+            <i class="fa-solid fa-chart-line text-court-dark"></i>
+            <span>Simulate Month</span>
+          </button>
+          <button onclick="simulateMonthReset()" class="px-3 py-1.5 bg-white hover:bg-red-50 text-red-600 border border-red-200 rounded-xl text-xs font-bold transition flex items-center gap-1.5">
+            <i class="fa-solid fa-arrow-rotate-left"></i>
+            <span>Simulate Month Reset</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Heatmap View Selector: Overall + per-subject tabs -->
+      <div class="flex flex-wrap items-center gap-2 py-3 border-b border-court-border">
+        <span class="text-[11px] font-mono font-bold text-court-dark shrink-0">Heatmap View:</span>
+        <div id="heatmapSubjectTabs" class="flex items-center gap-1.5 flex-wrap"></div>
+      </div>
+
+      <!-- Color Scale Legend -->
+      <div class="flex flex-wrap items-center justify-between gap-3 py-3 border-b border-court-border text-xs font-mono">
+        <div class="text-court-deep font-sans font-bold text-[11px] flex items-center gap-1.5">
+          <i class="fa-solid fa-swatchbook text-court-dark"></i>
+          <span>Study Minutes Color Scale:</span>
+        </div>
+        <div class="flex items-center gap-2.5 flex-wrap text-[11px]">
+          <div class="flex items-center gap-1.5"><span class="w-6 h-5 rounded border border-court-border bg-[#f4f5ef] text-court-dark/40 font-bold text-[10px] flex items-center justify-center">0</span><span class="text-court-dark/70 font-sans">0m (Fresh)</span></div>
+          <div class="flex items-center gap-1.5"><span class="w-6 h-5 rounded border border-court-line bg-[#c8dcda] text-[#3e5856] font-bold text-[10px] flex items-center justify-center">12</span><span class="text-court-dark/70 font-sans">1–15m</span></div>
+          <div class="flex items-center gap-1.5"><span class="w-6 h-5 rounded border border-court-soft bg-[#c7d2c1] text-[#3a4937] font-bold text-[10px] flex items-center justify-center">25</span><span class="text-court-dark/70 font-sans">16–35m</span></div>
+          <div class="flex items-center gap-1.5"><span class="w-6 h-5 rounded border border-court-light bg-[#a5bda1] text-[#2b3a29] font-bold text-[10px] flex items-center justify-center">45</span><span class="text-court-dark/70 font-sans">36–50m</span></div>
+          <div class="flex items-center gap-1.5"><span class="w-6 h-5 rounded border border-court-lawn bg-[#778673] text-white font-black text-[10px] flex items-center justify-center">58</span><span class="text-court-dark/70 font-sans">51–60m</span></div>
+        </div>
+      </div>
+
+      <!-- 30x24 Matrix Table -->
+      <div class="mt-4 overflow-x-auto overflow-y-auto max-h-[440px] rounded-xl border border-court-border bg-white shadow-inner">
+        <div id="matrixGridWrapper" class="matrix-standard min-w-max">
+          <table class="border-collapse w-full font-mono text-center select-none">
+            <thead>
+              <tr class="sticky-row bg-court-lawn text-white text-[11px] shadow-xs">
+                <th class="sticky-corner bg-court-deep text-court-accent px-3 py-2.5 text-left border-r border-b border-court-dark font-sans font-extrabold min-w-[75px]">HR \ DAY</th>
+                <script>
+                  for (let d = 1; d <= 30; d++) {
+                    const dStr = d < 10 ? '0' + d : d;
+                    document.write(`<th class="px-1 py-2 min-w-[32px] border-r border-court-dark font-mono font-bold hover:bg-court-mid transition-colors">D${dStr}</th>`);
+                  }
+                </script>
+                <th class="sticky-col-right bg-court-deep text-white px-3 py-2 text-center font-sans font-extrabold border-l border-b border-court-dark min-w-[70px]">HR TOTAL</th>
+              </tr>
+            </thead>
+            <tbody id="matrixGridTableBody" class="divide-y divide-court-border"></tbody>
+            <tfoot>
+              <tr class="sticky-bottom bg-court-tint text-court-lawn font-bold text-[10px] border-t-2 border-court-line">
+                <td class="sticky-col bg-court-tint px-3 py-2 text-left font-sans border-r border-court-line font-black">DAY TOTAL</td>
+                <script>
+                  for (let d = 1; d <= 30; d++) {
+                    document.write(`<td id="day-sum-${d}" class="px-0.5 py-2 border-r border-court-line font-mono text-court-lawn">0m</td>`);
+                  }
+                </script>
+                <td id="grandMonthTotalCell" class="px-2 py-2 font-black font-sans text-court-deep bg-court-soft/40 border-l border-court-line">0h</td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      </div>
+
+      <!-- Analytics Metrics -->
+      <div class="mt-5 grid grid-cols-2 md:grid-cols-4 gap-3.5">
+        <div class="bg-court-tint/60 p-4 rounded-xl border border-court-border flex items-center gap-3.5">
+          <div class="w-10 h-10 rounded-xl bg-court-lawn text-court-accent flex items-center justify-center text-lg shadow-xs"><i class="fa-solid fa-hourglass-half"></i></div>
+          <div><div class="text-[10px] text-court-dark/70 uppercase font-mono font-extrabold tracking-wider">Monthly Total</div><div id="metricMonthlyTotal" class="text-base sm:text-lg font-black font-mono text-court-deep">0.0 Hours</div></div>
+        </div>
+        <div class="bg-court-tint/60 p-4 rounded-xl border border-court-border flex items-center gap-3.5">
+          <div class="w-10 h-10 rounded-xl bg-court-lawn text-court-accent flex items-center justify-center text-lg shadow-xs"><i class="fa-solid fa-bolt"></i></div>
+          <div><div class="text-[10px] text-court-dark/70 uppercase font-mono font-extrabold tracking-wider">Peak Study Hour</div><div id="metricPeakHour" class="text-base sm:text-lg font-black font-mono text-court-deep">None (Fresh)</div></div>
+        </div>
+        <div class="bg-court-tint/60 p-4 rounded-xl border border-court-border flex items-center gap-3.5">
+          <div class="w-10 h-10 rounded-xl bg-court-lawn text-court-accent flex items-center justify-center text-lg shadow-xs"><i class="fa-solid fa-chart-column"></i></div>
+          <div><div class="text-[10px] text-court-dark/70 uppercase font-mono font-extrabold tracking-wider">Daily Average</div><div id="metricDailyAverage" class="text-base sm:text-lg font-black font-mono text-court-deep">0.0 Min / Day</div></div>
+        </div>
+        <div class="bg-court-tint/60 p-4 rounded-xl border border-court-border flex items-center gap-3.5">
+          <div class="w-10 h-10 rounded-xl bg-court-lawn text-court-accent flex items-center justify-center text-lg shadow-xs"><i class="fa-solid fa-trophy"></i></div>
+          <div><div class="text-[10px] text-court-dark/70 uppercase font-mono font-extrabold tracking-wider">Most Focused Day</div><div id="metricBestDay" class="text-base sm:text-lg font-black font-mono text-court-deep">None (Fresh)</div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== BOTTOM ROW: FILE LAUNCHER (WITH IN-APP VIEWER) & EDITABLE FOCUS GUARD ==================== -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+      <!-- 4. QUICK LOCAL FILE LAUNCHER & IN-APP DOCUMENT VIEWER -->
+      <section class="lg:col-span-6 tennis-card p-5 sm:p-6 flex flex-col justify-between">
+        <div>
+          <div class="flex items-center justify-between pb-3 mb-3 border-b border-court-border">
+            <div class="flex items-center gap-2.5">
+              <span class="w-8 h-8 rounded-lg bg-court-tint flex items-center justify-center text-court-dark text-sm border border-court-line"><i class="fa-solid fa-folder-tree"></i></span>
+              <div>
+                <h2 class="font-bold text-sm text-court-deep">Quick Local File Launcher & Reader</h2>
+                <span class="text-[10px] text-court-dark/70 font-mono">Store & View PDFs, Word Docs & Notes</span>
+              </div>
+            </div>
+            <span class="text-[10px] font-mono px-2.5 py-0.5 rounded-full bg-court-tint text-court-lawn border border-court-line font-black">LOCAL SYSTEM</span>
+          </div>
+
+          <p class="text-xs text-court-dark/80 mb-3 font-medium">
+            Upload PDF textbooks or Word notes directly into sandbox memory. Click <strong>"Open / View"</strong> to read them immediately in the built-in document viewer!
+          </p>
+
+          <!-- Native File Pickers -->
+          <input type="file" id="nativeFileInput" accept=".pdf,.doc,.docx,.txt,.md,image/*" multiple onchange="handleRealFileSelect(event)" class="hidden">
+          <input type="file" id="nativeFolderInput" webkitdirectory onchange="handleNativeFolderSelect(event)" class="hidden">
+
+          <div class="grid grid-cols-2 gap-2 mb-3">
+            <button onclick="document.getElementById('nativeFileInput').click()" class="py-2.5 px-3 bg-court-lawn hover:bg-court-dark text-white font-bold text-xs rounded-xl shadow-xs transition flex items-center justify-center gap-2">
+              <i class="fa-solid fa-file-pdf text-court-accent"></i>
+              <span>Add PDF / Word File...</span>
+            </button>
+            <button onclick="document.getElementById('nativeFolderInput').click()" class="py-2.5 px-3 bg-court-tint hover:bg-court-line/40 text-court-lawn font-bold text-xs rounded-xl border border-court-line transition flex items-center justify-center gap-2">
+              <i class="fa-regular fa-folder-closed text-court-dark"></i>
+              <span>Link Folder...</span>
+            </button>
+          </div>
+
+          <!-- Manual Path Input Bar -->
+          <form onsubmit="event.preventDefault(); addNewLocalFilePath();" class="flex gap-2 mb-3">
+            <div class="relative flex-1">
+              <i class="fa-solid fa-terminal absolute left-3 top-3 text-court-dark/50 text-xs"></i>
+              <input type="text" id="manualPathInput" placeholder="Or paste local path (e.g. C:\Users\Docs\Physics.pdf)" class="w-full bg-white border border-court-border rounded-xl pl-8 pr-3 py-2 text-xs text-court-deep placeholder-court-dark/40 focus:outline-none focus:border-court-lawn font-mono transition">
+            </div>
+            <button type="submit" class="px-3.5 py-2 bg-court-tint hover:bg-court-line/40 text-court-lawn border border-court-line font-bold text-xs rounded-xl transition flex items-center gap-1 shrink-0">
+              <i class="fa-solid fa-plus text-court-dark"></i><span>Add</span>
+            </button>
+          </form>
+
+          <!-- Files List Container -->
+          <div id="localFileStorageList" class="space-y-2 max-h-[190px] overflow-y-auto pr-1"></div>
+        </div>
+
+        <div class="mt-4 pt-3 border-t border-court-border flex justify-between items-center text-xs text-court-dark/70 font-medium">
+          <span class="flex items-center gap-1.5 font-mono text-[11px]"><i class="fa-solid fa-hard-drive text-court-dark"></i><span>Local Sandbox Storage</span></span>
+          <button onclick="clearAllLocalFiles()" class="text-red-600 hover:text-red-800 transition text-[11px] font-bold font-mono"><i class="fa-solid fa-trash-can mr-1"></i>Clear All</button>
+        </div>
+      </section>
+
+      <!-- 5. BREAK DIRECTORY (WITH EDITABLE FOCUS GUARD LOCK) -->
+      <section class="lg:col-span-6 tennis-card p-5 sm:p-6 flex flex-col justify-between relative overflow-hidden">
+        <div>
+          <div class="flex items-center justify-between pb-3 mb-3 border-b border-court-border">
+            <div class="flex items-center gap-2.5">
+              <span class="w-8 h-8 rounded-lg bg-court-tint flex items-center justify-center text-court-dark text-sm border border-court-line"><i class="fa-solid fa-spa"></i></span>
+              <div>
+                <h2 class="font-bold text-sm text-court-deep">Break & Relaxation Directory</h2>
+                <span class="text-[10px] text-court-dark/70 font-mono">Rest Portals & Customizable Guard</span>
+              </div>
+            </div>
+
+            <!-- Focus Guard Status with Edit Button -->
+            <div class="flex items-center gap-2">
+              <div id="focusGuardBadgeContainer" class="flex items-center gap-2 bg-court-deep text-white px-3 py-1 rounded-full border border-court-lawn shadow-xs">
+                <i id="focusGuardIcon" class="fa-solid fa-lock text-court-accent text-xs"></i>
+                <span id="focusGuardStateBadge" class="text-[11px] font-black font-mono tracking-wider text-court-accent">Focus Guard: LOCKED</span>
+              </div>
+              <button onclick="promptEditFocusGuardLock()" class="px-2.5 py-1 rounded-full bg-court-tint hover:bg-court-line/40 text-court-lawn border border-court-line text-[11px] font-mono font-bold flex items-center gap-1" title="Customize Lock Minutes">
+                <i class="fa-solid fa-sliders text-court-dark"></i>
+                <span id="guardTargetMinsLabel">40m</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="mb-4">
+            <div class="flex items-center justify-between text-xs mb-1.5">
+              <span class="text-court-deep font-semibold flex items-center gap-1">
+                <span>Continuous Study Lock:</span>
+                <button onclick="promptEditFocusGuardLock()" class="text-[10px] text-court-dark hover:underline font-mono">(Edit Target)</button>
+              </span>
+              <span id="focusGuardCountdownText" class="font-mono text-court-dark font-extrabold text-[11px]">00:00 / 40:00 Continuous</span>
+            </div>
+            <div class="w-full bg-court-tint rounded-full h-2 overflow-hidden border border-court-border">
+              <div id="focusGuardProgressBar" class="bg-court-lawn h-full rounded-full transition-all duration-300" style="width: 0%;"></div>
+            </div>
+            <p id="focusGuardSubtext" class="text-[11px] text-court-dark/70 mt-1 font-medium">Directory remains strictly locked until continuous focus target is reached.</p>
+          </div>
+
+          <div id="breakDirectoryContainer" class="focus-guard-locked grid grid-cols-2 lg:grid-cols-4 gap-3">
+            <button onclick="launchRelaxationPortal('JioSaavn', 'https://www.jiosaavn.com')" class="p-3.5 rounded-xl bg-court-tint hover:bg-court-line/40 border border-court-line transition flex flex-col items-center gap-2 group">
+              <div class="w-10 h-10 rounded-xl bg-white flex items-center justify-center shadow-xs group-hover:scale-110 transition-transform"><i class="fa-solid fa-compact-disc text-court-light text-2xl"></i></div>
+              <span class="text-xs font-extrabold text-court-deep">JioSaavn</span>
+              <span class="text-[10px] text-court-dark/70 font-mono">Lo-Fi Beats</span>
+            </button>
+            <button onclick="launchRelaxationPortal('YouTube', 'https://www.youtube.com')" class="p-3.5 rounded-xl bg-court-tint hover:bg-court-line/40 border border-court-line transition flex flex-col items-center gap-2 group">
+              <div class="w-10 h-10 rounded-xl bg-white flex items-center justify-center shadow-xs group-hover:scale-110 transition-transform"><i class="fa-solid fa-clapperboard text-red-600 text-2xl"></i></div>
+              <span class="text-xs font-extrabold text-court-deep">YouTube</span>
+              <span class="text-[10px] text-court-dark/70 font-mono">Audio Focus</span>
+            </button>
+            <button onclick="launchRelaxationPortal('Aha Health', 'https://www.ahatherapy.com')" class="p-3.5 rounded-xl bg-court-tint hover:bg-court-line/40 border border-court-line transition flex flex-col items-center gap-2 group">
+              <div class="w-10 h-10 rounded-xl bg-white flex items-center justify-center shadow-xs group-hover:scale-110 transition-transform"><i class="fa-solid fa-heart-pulse text-rose-500 text-2xl"></i></div>
+              <span class="text-xs font-extrabold text-court-deep">Aha Health</span>
+              <span class="text-[10px] text-court-dark/70 font-mono">Mind & Body</span>
+            </button>
+            <button onclick="launchRelaxationPortal('Chess', 'https://lichess.org')" class="p-3.5 rounded-xl bg-court-tint hover:bg-court-line/40 border border-court-line transition flex flex-col items-center gap-2 group">
+              <div class="w-10 h-10 rounded-xl bg-white flex items-center justify-center shadow-xs group-hover:scale-110 transition-transform"><i class="fa-solid fa-chess-knight text-court-deep text-2xl"></i></div>
+              <span class="text-xs font-extrabold text-court-deep">Chess</span>
+              <span class="text-[10px] text-court-dark/70 font-mono">Tactics Rest</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="mt-4 pt-3 border-t border-court-border flex flex-wrap items-center justify-between gap-2">
+          <div class="text-xs text-court-dark font-medium flex items-center gap-1.5 font-mono">
+            <i class="fa-solid fa-shield-halved text-court-dark"></i>
+            <span>Distraction Prevention Active</span>
+          </div>
+          <div class="flex items-center gap-3">
+            <button onclick="devFastForwardLock()" class="text-[10px] font-mono text-court-dark hover:text-court-lawn underline font-bold" title="Complete continuous study target immediately">[Dev Test: Unlock]</button>
+            <button onclick="triggerImmediateBreak()" class="text-xs font-bold text-court-lawn hover:text-court-dark transition flex items-center gap-1">
+              <i class="fa-solid fa-mug-hot"></i>
+              <span>Take 5-Min Rest Break</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+    </div>
+
+    <!-- ==================== LIVE STUDY GROUP & VIRTUAL PEERS ==================== -->
+    <section class="tennis-card p-5">
+      <div class="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-court-border">
+        <div class="flex items-center gap-2">
+          <span class="w-8 h-8 rounded-lg bg-court-lawn text-white flex items-center justify-center text-sm"><i class="fa-solid fa-users text-court-accent"></i></span>
+          <div>
+            <h3 class="font-bold text-sm text-court-deep">Virtual Study Group • Green Lawn Room</h3>
+            <span class="text-[10px] text-court-dark/70 font-mono">Live peers studying concurrently</span>
+          </div>
+        </div>
+        <div class="flex items-center gap-2 text-xs font-mono">
+          <span class="w-2.5 h-2.5 rounded-full bg-court-light animate-ping"></span>
+          <span class="font-bold text-court-lawn">4 Peers Studying Live</span>
+        </div>
+      </div>
+
+      <div class="mt-3.5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
+        <div class="p-3 rounded-xl bg-court-tint/50 border border-court-line flex items-center justify-between">
+          <div class="flex items-center gap-2.5">
+            <div class="w-9 h-9 rounded-full bg-court-lawn text-white font-bold flex items-center justify-center text-xs">#1</div>
+            <div>
+              <div class="font-extrabold text-court-deep">Elena Rostova</div>
+              <div class="text-[10px] text-court-dark/70 font-mono">💻 Computer Science</div>
+            </div>
+          </div>
+          <div class="text-right font-mono">
+            <div class="font-extrabold text-court-lawn">4h 18m</div>
+            <div class="text-[9px] text-court-dark font-bold">● Studying</div>
+          </div>
+        </div>
+
+        <div class="p-3 rounded-xl bg-court-tint/50 border border-court-line flex items-center justify-between">
+          <div class="flex items-center gap-2.5">
+            <div class="w-9 h-9 rounded-full bg-court-mid text-white font-bold flex items-center justify-center text-xs">#2</div>
+            <div>
+              <div class="font-extrabold text-court-deep">Marcus Chen</div>
+              <div class="text-[10px] text-court-dark/70 font-mono">📐 Mathematics</div>
+            </div>
+          </div>
+          <div class="text-right font-mono">
+            <div class="font-extrabold text-court-lawn">3h 52m</div>
+            <div class="text-[9px] text-court-dark font-bold">● Studying</div>
+          </div>
+        </div>
+
+        <div class="p-3 rounded-xl bg-white border-2 border-court-lawn flex items-center justify-between shadow-2xs">
+          <div class="flex items-center gap-2.5">
+            <div class="w-9 h-9 rounded-full bg-court-accent text-court-deep font-black flex items-center justify-center text-xs">YOU</div>
+            <div>
+              <div class="font-extrabold text-court-deep">Current User</div>
+              <div class="text-[10px] text-court-dark font-mono" id="peerUserSubject">📐 Mathematics</div>
+            </div>
+          </div>
+          <div class="text-right font-mono">
+            <div class="font-extrabold text-court-deep" id="peerUserTodaySum">0m</div>
+            <div class="text-[9px] text-court-lawn font-bold" id="peerUserLiveStatus">● Inactive</div>
+          </div>
+        </div>
+
+        <div class="p-3 rounded-xl bg-court-tint/50 border border-court-line flex items-center justify-between">
+          <div class="flex items-center gap-2.5">
+            <div class="w-9 h-9 rounded-full bg-court-dark text-white font-bold flex items-center justify-center text-xs">#4</div>
+            <div>
+              <div class="font-extrabold text-court-deep">Aisha Morales</div>
+              <div class="text-[10px] text-court-dark/70 font-mono">🧬 Biology</div>
+            </div>
+          </div>
+          <div class="text-right font-mono">
+            <div class="font-extrabold text-court-dark">2h 15m</div>
+            <div class="text-[9px] text-amber-600 font-bold">☕ Resting</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ==================== FLOATING BOTTOM RIGHT UI ==================== -->
+  <div class="fixed bottom-6 right-6 z-50 flex flex-col items-end">
+    <!-- AI Academic Doubt Solver Drawer -->
+    <div id="aiTutorWidget" class="hidden w-[92vw] sm:w-[420px] h-[540px] bg-white border-2 border-court-lawn rounded-2xl shadow-2xl flex flex-col overflow-hidden mb-3 animate-in fade-in duration-300">
+      <div class="bg-court-lawn p-4 text-white flex items-center justify-between border-b border-court-dark">
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 rounded-xl bg-court-deep border border-court-light flex items-center justify-center text-court-accent text-base"><i class="fa-solid fa-graduation-cap"></i></div>
+          <div>
+            <h3 class="text-sm font-extrabold text-white">AI Academic Doubt Solver</h3>
+            <span class="text-[10px] text-court-line font-mono font-bold tracking-wide">Gemini-powered Math, Science & Study Tutor</span>
+          </div>
+        </div>
+        <div class="flex items-center gap-0.5">
+          <button onclick="toggleTutorKeyPanel()" class="text-court-line hover:text-white p-1.5 transition" title="Gemini API key" aria-label="Gemini API key"><i class="fa-solid fa-key text-sm"></i></button>
+          <button onclick="clearTutorChat()" class="text-court-line hover:text-white p-1.5 transition" title="Clear conversation" aria-label="Clear conversation"><i class="fa-solid fa-trash-can text-sm"></i></button>
+          <button onclick="toggleAiTutorWidget()" class="text-court-line hover:text-white p-1.5 transition" title="Close" aria-label="Close tutor"><i class="fa-solid fa-xmark text-lg"></i></button>
+        </div>
+      </div>
+      <div id="tutorKeyPanel" class="hidden px-3.5 py-3 bg-court-tint border-b border-court-border text-[11px]">
+        <label for="tutorApiKeyInput" class="block font-mono font-bold text-court-deep mb-1">Gemini API key (stored only in this browser)</label>
+        <div class="flex gap-2">
+          <input type="password" id="tutorApiKeyInput" autocomplete="off" placeholder="AIzaSy..." onkeypress="if(event.key==='Enter') saveTutorApiKey()" class="flex-1 min-w-0 bg-white border border-court-border rounded-lg px-2.5 py-1.5 font-mono text-court-deep focus:outline-none focus:border-court-lawn">
+          <button onclick="saveTutorApiKey()" class="px-3 py-1.5 rounded-lg bg-court-lawn hover:bg-court-dark text-white font-bold transition">Save</button>
+        </div>
+        <p class="text-court-dark/70 mt-1.5 leading-snug">Get a free key at <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener" class="underline font-bold">Google AI Studio</a>. The same key powers Gemini Vision.</p>
+      </div>
+      <div id="tutorChatHistory" class="flex-1 p-4 overflow-y-auto space-y-3.5 bg-court-surface text-xs">
+        <div class="flex gap-2.5">
+          <div class="w-7 h-7 rounded-lg bg-court-lawn text-white flex items-center justify-center text-[10px] font-bold shrink-0 shadow-xs"><i class="fa-solid fa-robot"></i></div>
+          <div class="bg-white p-3 rounded-2xl text-court-deep border border-court-border max-w-[85%] shadow-xs leading-relaxed">
+            <p class="font-bold text-court-lawn mb-1">Welcome to Study Garden Tutor 🌱</p>
+            I'm your 24/7 Academic Copilot, powered by Gemini. Type any problem or concept, or tap the camera button to upload a photo of your homework.
+          </div>
+        </div>
+      </div>
+      <div class="px-3.5 py-2 bg-court-tint/70 border-t border-court-border flex gap-2 overflow-x-auto text-[10px] text-court-lawn font-mono">
+        <button onclick="sendQuickPrompt('Explain Photosynthesis step-by-step with chemical equation')" class="px-2.5 py-1 rounded-lg bg-white border border-court-line font-bold hover:bg-court-line/30 whitespace-nowrap transition">🌿 Photosynthesis</button>
+        <button onclick="sendQuickPrompt('Solve integral: ∫ x * e^(2x) dx with integration by parts')" class="px-2.5 py-1 rounded-lg bg-white border border-court-line font-bold hover:bg-court-line/30 whitespace-nowrap transition">📐 Calculus Integral</button>
+        <button onclick="sendQuickPrompt('Summarize Feynman Technique for memorizing formulas')" class="px-2.5 py-1 rounded-lg bg-white border border-court-line font-bold hover:bg-court-line/30 whitespace-nowrap transition">🧠 Feynman Technique</button>
+      </div>
+      <div class="p-3 bg-white border-t border-court-border flex items-center gap-2">
+        <label for="homeworkImagePicker" class="p-2.5 rounded-xl bg-court-tint hover:bg-court-line/40 text-court-lawn text-xs border border-court-line cursor-pointer transition flex items-center justify-center shrink-0" title="Upload a homework photo for Gemini to read and solve">
+          <i class="fa-solid fa-camera-retro text-base"></i>
+        </label>
+        <input type="file" id="homeworkImagePicker" accept="image/*" class="hidden" onchange="handleHomeworkPhotoUpload(event)">
+        <input type="text" id="tutorQueryInput" onkeypress="if(event.key==='Enter') submitTutorQuestion()" placeholder="Ask formula, step-by-step problem, or doubt..." class="flex-1 bg-court-surface border border-court-border rounded-xl px-3 py-2 text-xs text-court-deep placeholder-court-dark/40 focus:outline-none focus:border-court-lawn font-sans transition">
+        <button id="tutorSendBtn" onclick="submitTutorQuestion()" aria-label="Send question" class="p-2.5 rounded-xl bg-court-lawn hover:bg-court-dark text-white font-bold text-xs transition shrink-0 shadow-xs"><i class="fa-solid fa-paper-plane text-court-accent"></i></button>
+      </div>
+    </div>
+    <!-- Floating Launcher Button -->
+    <button id="floatingTutorTriggerBtn" onclick="toggleAiTutorWidget()" class="w-14 h-14 rounded-full bg-court-lawn text-white shadow-xl flex items-center justify-center border-2 border-white hover:bg-court-dark transition-all duration-300 hover:scale-105 group relative">
+      <i class="fa-solid fa-graduation-cap text-xl text-court-accent group-hover:scale-110 transition-transform"></i>
+      <span class="absolute -top-1 -right-1 w-5 h-5 bg-court-light text-court-deep font-black rounded-full text-[10px] flex items-center justify-center border-2 border-white shadow-xs">1</span>
+    </button>
+  </div>
+
+  <!-- Notification Toast -->
+  <div id="gardenToast" class="fixed top-20 right-6 z-50 transform translate-y-[-20px] opacity-0 pointer-events-none transition-all duration-300 max-w-sm w-full">
+    <div class="bg-white border-2 border-court-lawn rounded-2xl p-4 shadow-2xl flex items-start gap-3.5 relative">
+      <div class="w-10 h-10 rounded-xl bg-court-lawn text-court-accent flex items-center justify-center text-lg shrink-0"><i class="fa-solid fa-seedling" id="toastIcon"></i></div>
+      <div class="flex-1 pr-4">
+        <div class="flex items-center justify-between">
+          <span class="text-[10px] font-mono font-extrabold uppercase tracking-wider text-court-dark">Study Garden Assistant</span>
+          <span class="text-[10px] text-court-dark/60 font-mono" id="toastTimestamp">Just now</span>
+        </div>
+        <h4 id="toastTitle" class="font-extrabold text-sm text-court-deep mt-0.5">Focus Reminder</h4>
+        <p id="toastMessage" class="text-xs text-court-dark/80 mt-1 leading-snug">Continuous session active.</p>
+      </div>
+      <button onclick="dismissToastNotification()" class="absolute top-2.5 right-2.5 text-court-dark/60 hover:text-court-deep transition"><i class="fa-solid fa-xmark text-sm"></i></button>
+    </div>
+  </div>
+
+  <!-- ==================== REAL IN-APP DOCUMENT / PDF VIEWER MODAL ==================== -->
+  <div id="docViewerModal" class="hidden fixed inset-0 bg-black/70 backdrop-blur-xs flex items-center justify-center p-3 sm:p-6 z-50">
+    <div class="bg-white border-2 border-court-lawn rounded-2xl max-w-5xl w-full h-[88vh] flex flex-col shadow-2xl overflow-hidden">
+      <div class="bg-court-lawn px-5 py-3 text-white flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <i class="fa-solid fa-file-lines text-court-accent text-base" id="docViewerIcon"></i>
+          <div>
+            <h3 class="text-sm font-bold text-white truncate max-w-md" id="docViewerTitle">Document Reader</h3>
+            <span class="text-[10px] text-court-line font-mono" id="docViewerMeta">In-App Study Sandbox Viewer</span>
+          </div>
+        </div>
+        <div class="flex items-center gap-2">
+          <button onclick="openDocInNewTab()" class="px-3 py-1 bg-court-deep hover:bg-court-dark text-white rounded-lg text-xs font-mono font-bold transition flex items-center gap-1.5">
+            <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
+            <span>Open in New Tab</span>
+          </button>
+          <button onclick="closeDocViewerModal()" class="text-court-line hover:text-white p-1 transition"><i class="fa-solid fa-xmark text-lg"></i></button>
+        </div>
+      </div>
+      <div class="flex-1 bg-court-surface relative overflow-hidden flex flex-col items-center justify-center" id="docViewerContentContainer">
+        <iframe id="pdfViewerFrame" class="w-full h-full border-0 hidden"></iframe>
+        <div id="textDocViewerBox" class="w-full h-full p-6 font-mono text-xs text-court-deep overflow-y-auto whitespace-pre-wrap hidden bg-white"></div>
+        <div id="docViewerFallbackNotice" class="text-center p-6 hidden">
+          <i class="fa-solid fa-file-word text-court-dark text-5xl mb-3"></i>
+          <h4 class="font-bold text-base text-court-deep" id="fallbackDocName">Word Document Registered</h4>
+          <p class="text-xs text-court-dark/70 max-w-md mx-auto mt-1 mb-4">Word documents (.docx/.doc) can be launched directly in Microsoft Word / Office on your computer or opened in a new tab.</p>
+          <button onclick="downloadActiveDoc()" class="px-4 py-2 bg-court-lawn hover:bg-court-dark text-white font-bold text-xs rounded-xl shadow-xs">Download / Open in Office</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== FOLDER SHORTCUT VIEWER MODAL (PDFs & Word Docs only) ==================== -->
+  <div id="folderViewerModal" class="hidden fixed inset-0 bg-black/70 backdrop-blur-xs flex items-center justify-center p-3 sm:p-6 z-50">
+    <div class="bg-white border-2 border-court-lawn rounded-2xl max-w-lg w-full max-h-[80vh] flex flex-col shadow-2xl overflow-hidden">
+      <div class="bg-court-lawn px-5 py-3 text-white flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <i class="fa-solid fa-folder-open text-court-accent text-base"></i>
+          <div>
+            <h3 class="text-sm font-bold text-white truncate max-w-xs" id="folderViewerTitle">Folder</h3>
+            <span class="text-[10px] text-court-line font-mono truncate block max-w-xs" id="folderViewerMeta">Linked Folder</span>
+          </div>
+        </div>
+        <button onclick="closeFolderViewerModal()" class="text-court-line hover:text-white p-1 transition"><i class="fa-solid fa-xmark text-lg"></i></button>
+      </div>
+      <div id="folderViewerFileList" class="flex-1 bg-court-surface p-3 space-y-2 overflow-y-auto"></div>
+    </div>
+  </div>
+
+  <!-- ==================== FULL-SCREEN DESK MODE MODAL ==================== -->
+  <div id="deskModeOverlay" class="hidden fixed inset-0 bg-[#262c23] text-white z-50 flex flex-col justify-between p-6 sm:p-12 animate-in fade-in duration-300">
+    <div class="flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <span class="w-3 h-3 rounded-full bg-court-light animate-ping"></span>
+        <span class="text-xs font-mono font-bold text-court-line uppercase tracking-widest">Minimalist Desk Mode</span>
+      </div>
+      <button onclick="toggleDeskMode()" class="px-3.5 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-mono font-bold border border-white/20 transition">
+        Exit Desk Mode ✕
+      </button>
+    </div>
+
+    <!-- Center Giant Clock & Subject -->
+    <div class="text-center my-auto space-y-4">
+      <div class="inline-block px-4 py-1 rounded-full bg-court-lawn/60 border border-court-light/30 text-court-accent text-sm font-mono font-bold" id="deskModeSubject">
+        📐 Mathematics
+      </div>
+      <div class="text-7xl sm:text-9xl font-black font-mono text-white tracking-widest drop-shadow-lg" id="deskModeTimerDigits">
+        00:00
+      </div>
+      <p class="text-xs text-court-line/70 font-mono italic" id="deskModeMotto">
+        "Focus on the step in front of you, not the whole staircase."
+      </p>
+      <div class="pt-4 flex items-center justify-center gap-4 text-xs font-mono">
+        <span class="px-3 py-1 rounded-full bg-white/5 border border-white/10">Attention: <strong id="deskModeAttentionVal" class="text-court-light">88%</strong></span>
+        <span class="px-3 py-1 rounded-full bg-white/5 border border-white/10">Continuous: <strong id="deskModeContinuousVal" class="text-court-line">0m 00s</strong></span>
+      </div>
+    </div>
+
+    <div class="flex justify-between items-center text-xs font-mono text-court-line/60">
+      <span>Anti-touch distraction shield active</span>
+      <span id="deskModeClockTime">--:--:--</span>
+    </div>
+  </div>
+
+  <!-- ==================== GEMINI VISION MODAL ==================== -->
+  <div id="geminiModal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 z-50">
+    <div class="bg-white border-2 border-court-lawn rounded-2xl max-w-lg w-full p-5 shadow-2xl space-y-4">
+      <div class="flex items-center justify-between pb-2 border-b border-court-border">
+        <div class="flex items-center gap-2">
+          <i class="fa-solid fa-wand-magic-sparkles text-court-lawn text-lg"></i>
+          <h3 class="font-extrabold text-base text-court-deep">Gemini Multimodal Posture & Gaze Audit</h3>
+        </div>
+        <button onclick="closeGeminiModal()" class="text-court-dark/60 hover:text-court-deep"><i class="fa-solid fa-xmark text-base"></i></button>
+      </div>
+      <p class="text-xs text-court-dark/80 leading-relaxed">
+        Send an instantaneous camera snapshot to Google Gemini 1.5/2.5 Flash to inspect cervical spine tilt, eye contact, desk ergonomics, and fatigue.
+      </p>
+      <div>
+        <label class="block text-[11px] font-mono font-bold text-court-deep mb-1">Gemini API Key (Optional / Stored locally):</label>
+        <input type="password" id="geminiApiKeyInput" placeholder="AIzaSy..." class="w-full bg-court-surface border border-court-border rounded-xl px-3 py-2 text-xs font-mono text-court-deep focus:outline-none focus:border-court-lawn">
+        <p class="text-[10px] text-court-dark/60 mt-1">If left blank, a simulated clinical ergonomic audit is generated immediately.</p>
+      </div>
+      <div id="geminiAuditResultBox" class="hidden p-3 rounded-xl bg-court-tint/70 border border-court-line text-xs font-mono max-h-[160px] overflow-y-auto whitespace-pre-wrap"></div>
+      <div class="flex justify-end gap-2 pt-2">
+        <button onclick="closeGeminiModal()" class="px-3 py-1.5 rounded-xl bg-court-surface border border-court-border text-court-deep text-xs font-bold">Close</button>
+        <button onclick="executeGeminiAuditFromModal()" class="px-4 py-1.5 rounded-xl bg-court-lawn hover:bg-court-dark text-white text-xs font-bold flex items-center gap-1.5 shadow-xs">
+          <i class="fa-solid fa-camera"></i>
+          <span>Capture Frame & Analyze</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== JAVASCRIPT CORE ENGINE ==================== -->
+  <script>
+    const GardenApp = {
+      webcamStream: null, isWebcamStreaming: false,
+      
+      // Vision state
+      faceDetected: true,
+      isLookingDown: false,
+      isLookingAway: false,
+      phoneDetected: false,
+      lastPoseSample: null,
+      poseBaseline: null,
+      cocoPhoneModel: null,
+      cocoDetectInFlight: false,
+      lastCocoDetectAt: 0,
+      
+      // Dynamic Attention & Factors
+      attentionScore: 88, gazeFactor: 94, postureFactor: 89, drowsinessFactor: 91, switchingFactor: 98,
+      
+      // Timer Engine: big clock = study (runs while session is active), small clock = rest (runs while paused)
+      timerMode: 'focus', focusDurationSecs: 60 * 60, breakDurationSecs: 5 * 60,
+      studyElapsedSecs: 0, remainingSecs: 0,
+      isTimerRunning: false, timerInterval: null, pausedBreakSecs: 0, pauseTrackerInterval: null,
+      studyHourKey: '', heatmapSecondBucket: 0,
+      
+      // Focus Guard Custom Threshold
+      focusGuardThresholdSecs: parseInt(localStorage.getItem('study_garden_focus_guard_secs') || '2400', 10),
+      continuousActiveSecs: 0, focusGuardLocked: true,
+
+      // Daily study goal (hours), shown on the 24-hour timeline
+      dailyStudyGoalHours: parseFloat(localStorage.getItem('study_garden_daily_goal_hours') || '6.0'),
+      
+      // 30x24 Matrix — one grid per subject, plus a selector for which view is shown ('Overall' or a subject name)
+      matrixCellSize: 'standard',
+      heatmapView: 'Overall',
+      matrixGridBySubject: {
+        'Math': Array.from({ length: 24 }, () => Array(30).fill(0)),
+        'Physics': Array.from({ length: 24 }, () => Array(30).fill(0)),
+        'Code': Array.from({ length: 24 }, () => Array(30).fill(0)),
+        'Bio': Array.from({ length: 24 }, () => Array(30).fill(0)),
+        'Literature': Array.from({ length: 24 }, () => Array(30).fill(0))
+      },
+      
+      // Local Files Storage
+      localFiles: [],
+      activeViewingDoc: null,
+      activeFolderIndex: null,
+
+      // D-Day exam countdowns
+      ddayList: [
+        { name: 'Finals', days: 18 },
+        { name: 'SAT/GRE', days: 42 }
+      ],
+      
+      // Study Suite
+      subjectsList: [
+        { name: 'Math', icon: '📐', color: '#778673' },
+        { name: 'Physics', icon: '⚛️', color: '#5f6e5b' },
+        { name: 'Code', icon: '💻', color: '#8fa88b' },
+        { name: 'Bio', icon: '🧬', color: '#5f8a86' },
+        { name: 'Literature', icon: '📚', color: '#d57d57' }
+      ],
+      activeSubject: 'Math',
+      activeSubjectIcon: '📐',
+      activeSubjectColor: '#778673',
+      subjectTimes: { 'Math': 0, 'Physics': 0, 'Code': 0, 'Bio': 0, 'Literature': 0 },
+      studyTimelineArr: Array(144).fill(null),
+      todayStudySeconds: 0,
+      studyTasks: [
+        { id: 1, subject: '📐 Math', title: 'Solve 20 Calculus Integration problems', done: true },
+        { id: 2, subject: '⚛️ Physics', title: 'Review Electromagnetism formulas', done: false },
+        { id: 3, subject: '💻 Code', title: 'Tree traversal algorithms practice', done: false }
+      ]
+    };
+
+    let toastTimeout = null;
+    function showToast(title, message, iconClass = 'fa-seedling') {
+      const toast = document.getElementById('gardenToast');
+      document.getElementById('toastTitle').innerText = title;
+      document.getElementById('toastMessage').innerText = message;
+      document.getElementById('toastIcon').className = `fa-solid ${iconClass}`;
+      document.getElementById('toastTimestamp').innerText = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      toast.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-[-20px]');
+      toast.classList.add('opacity-100', 'pointer-events-auto', 'translate-y-0');
+      if (toastTimeout) clearTimeout(toastTimeout);
+      toastTimeout = setTimeout(dismissToastNotification, 5000);
+    }
+    function dismissToastNotification() {
+      const toast = document.getElementById('gardenToast');
+      toast.classList.add('opacity-0', 'pointer-events-none', 'translate-y-[-20px]');
+      toast.classList.remove('opacity-100', 'pointer-events-auto', 'translate-y-0');
+    }
+
+    function setElText(id, text) {
+      const el = document.getElementById(id);
+      if (el) el.innerText = text;
+    }
+    function setElClass(id, className) {
+      const el = document.getElementById(id);
+      if (el) el.className = className;
+    }
+
+    // --- ULTRA-DYNAMIC GAZE, PHONE & OFF-SCREEN DETECTION ENGINE ---
+    async function toggleRealCameraStream() {
+      const video = document.getElementById('webcamElement');
+      const label = document.getElementById('cameraToggleLabel');
+      const icon = document.getElementById('cameraToggleIcon');
+      const statusDot = document.getElementById('cameraStatusDot');
+      const statusText = document.getElementById('cameraStatusText');
+
+      if (!GardenApp.isWebcamStreaming) {
+        try {
+          const stream = await navigator.mediaDevices.getUserMedia({
+            video: { width: { ideal: 640 }, height: { ideal: 480 }, facingMode: 'user' },
+            audio: false
+          });
+          GardenApp.webcamStream = stream;
+          video.srcObject = stream;
+          video.classList.remove('hidden');
+          GardenApp.isWebcamStreaming = true;
+          label.innerText = 'Stop Camera';
+          icon.className = 'fa-solid fa-video-slash text-court-accent';
+          statusDot.className = 'w-1.5 h-1.5 rounded-full bg-court-light animate-ping';
+          statusText.innerText = 'LIVE WEBCAM WEBRTC';
+          showToast('Camera Connected', 'Sit in your normal study pose, then tap Calibrate.');
+          loadCocoPhoneDetector();
+        } catch (err) {
+          let why = 'Falling back to simulation mode.';
+          if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) why = 'Camera needs a secure page. Open this file directly (file://) or via https / localhost, not a plain http address.';
+          else if (err && err.name === 'NotAllowedError') why = 'Allow camera access in the browser address bar, then try again.';
+          else if (err && err.name === 'NotFoundError') why = 'No camera was found on this device.';
+          else if (err && err.name === 'NotReadableError') why = 'Another app is using the camera. Close it and try again.';
+          showToast('Camera Unavailable', why, 'fa-triangle-exclamation');
+        }
+      } else {
+        if (GardenApp.webcamStream) GardenApp.webcamStream.getTracks().forEach(t => t.stop());
+        video.classList.add('hidden'); video.srcObject = null; GardenApp.webcamStream = null;
+        GardenApp.isWebcamStreaming = false;
+        label.innerText = 'Enable Live Camera';
+        icon.className = 'fa-solid fa-camera text-court-accent';
+        statusDot.className = 'w-1.5 h-1.5 rounded-full bg-court-accent';
+        statusText.innerText = 'SIMULATED FEED';
+        showToast('Camera Stopped', 'Surveillance reverted to simulated stream.');
+      }
+    }
+
+    function initSurveillanceCanvasEngine() {
+      const canvas = document.getElementById('surveillanceCanvas');
+      const ctx = canvas.getContext('2d');
+      const video = document.getElementById('webcamElement');
+
+      function resize() {
+        if (canvas.parentElement) { canvas.width = canvas.parentElement.clientWidth; canvas.height = canvas.parentElement.clientHeight; }
+      }
+      resize();
+      window.addEventListener('resize', resize);
+
+      let step = 0;
+      let lastAnalysisTime = 0;
+
+      function renderVisionLoop(nowTime) {
+        step += 0.05; const w = canvas.width; const h = canvas.height;
+        ctx.clearRect(0, 0, w, h);
+
+        if (GardenApp.isWebcamStreaming && video.readyState >= 2) {
+          ctx.save(); ctx.translate(w, 0); ctx.scale(-1, 1);
+          ctx.drawImage(video, 0, 0, w, h); ctx.restore();
+
+          // Sample pose from the raw camera frame before overlay tint
+          if (nowTime - lastAnalysisTime > 150) {
+            lastAnalysisTime = nowTime;
+            performRealComputerVisionAnalysis(ctx, w, h);
+          }
+
+          ctx.fillStyle = 'rgba(119, 134, 115, 0.12)'; ctx.fillRect(0, 0, w, h);
+        } else {
+          // Simulation feed
+          ctx.fillStyle = '#2f3a2d'; ctx.fillRect(0, 0, w, h);
+          ctx.strokeStyle = 'rgba(199, 210, 193, 0.1)'; ctx.lineWidth = 1;
+          for (let x = 0; x < w; x += 30) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, h); ctx.stroke(); }
+          for (let y = 0; y < h; y += 30) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke(); }
+          GardenApp.faceDetected = true;
+          document.getElementById('absenceAlertBanner').classList.add('hidden');
+          document.getElementById('phoneAlertBanner').classList.add('hidden');
+        }
+
+        // Draw live tracking crosshairs & head box
+        if (GardenApp.faceDetected) {
+          let boxColor = '#a5bda1'; // Green when focused
+          let headX = w / 2;
+          let headY = h / 2 - 8;
+
+          if (GardenApp.isLookingDown) {
+            boxColor = '#f59e0b'; // Amber for phone
+            headY += 20; // Shift down
+          } else if (GardenApp.isLookingAway) {
+            boxColor = '#f59e0b'; // Amber for looking away
+            headX += (Math.sin(step) * 15);
+          }
+
+          ctx.strokeStyle = boxColor; ctx.lineWidth = 1.8;
+          ctx.strokeRect(headX - 46, headY - 58, 92, 116);
+          const cl = 12; ctx.strokeStyle = '#d57d57'; ctx.lineWidth = 2.5;
+          ctx.beginPath(); ctx.moveTo(headX - 46, headY - 58 + cl); ctx.lineTo(headX - 46, headY - 58); ctx.lineTo(headX - 46 + cl, headY - 58); ctx.stroke();
+          ctx.beginPath(); ctx.moveTo(headX + 46 - cl, headY - 58); ctx.lineTo(headX + 46, headY - 58); ctx.lineTo(headX + 46, headY - 58 + cl); ctx.stroke();
+          ctx.beginPath(); ctx.moveTo(headX - 46, headY + 58 - cl); ctx.lineTo(headX - 46, headY + 58); ctx.lineTo(headX - 46 + cl, headY + 58); ctx.stroke();
+          ctx.beginPath(); ctx.moveTo(headX + 46 - cl, headY + 58); ctx.lineTo(headX + 46, headY + 58); ctx.lineTo(headX + 46, headY + 58 - cl); ctx.stroke();
+
+          // Eyes
+          ctx.fillStyle = boxColor;
+          ctx.beginPath(); ctx.arc(headX - 14, headY - 8, 3.5, 0, Math.PI * 2); ctx.fill();
+          ctx.beginPath(); ctx.arc(headX + 14, headY - 8, 3.5, 0, Math.PI * 2); ctx.fill();
+
+          // Gaze Vector
+          ctx.strokeStyle = boxColor; ctx.lineWidth = 1.5;
+          ctx.beginPath();
+          const targetY = GardenApp.isLookingDown ? headY + 28 : headY + 12;
+          ctx.moveTo(headX - 14, headY - 8); ctx.lineTo(headX - 14, targetY);
+          ctx.moveTo(headX + 14, headY - 8); ctx.lineTo(headX + 14, targetY);
+          ctx.stroke();
+        }
+
+        requestAnimationFrame(renderVisionLoop);
+      }
+      requestAnimationFrame(renderVisionLoop);
+    }
+
+    function loadScriptOnce(src, id) {
+      return new Promise((resolve, reject) => {
+        if (document.getElementById(id)) { resolve(); return; }
+        const s = document.createElement('script');
+        s.id = id; s.src = src; s.async = true;
+        s.onload = () => resolve();
+        s.onerror = () => reject(new Error('Failed to load ' + src));
+        document.head.appendChild(s);
+      });
+    }
+
+    async function loadCocoPhoneDetector() {
+      if (GardenApp.cocoPhoneModel) return;
+      try {
+        await loadScriptOnce('https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.17.0/dist/tf.min.js', 'tfjs-cdn');
+        await loadScriptOnce('https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd@2.2.3/dist/coco-ssd.min.js', 'coco-ssd-cdn');
+        if (window.cocoSsd) {
+          GardenApp.cocoPhoneModel = await window.cocoSsd.load({ base: 'lite_mobilenet_v2' });
+        }
+      } catch (err) {
+        console.warn('Phone object detector unavailable, using pose heuristics.', err);
+      }
+    }
+
+    async function runCocoPhoneDetection() {
+      if (!GardenApp.cocoPhoneModel || !GardenApp.isWebcamStreaming || GardenApp.cocoDetectInFlight) return;
+      const video = document.getElementById('webcamElement');
+      if (!video || video.readyState < 2) return;
+      const now = performance.now();
+      if (now - GardenApp.lastCocoDetectAt < 450) return;
+      GardenApp.lastCocoDetectAt = now;
+      GardenApp.cocoDetectInFlight = true;
+      try {
+        const preds = await GardenApp.cocoPhoneModel.detect(video);
+        GardenApp.phoneDetected = preds.some(p => {
+          const label = (p.class || '').toLowerCase();
+          return (label === 'cell phone' || label === 'remote') && p.score > 0.38;
+        });
+      } catch (err) {
+        /* keep last phoneDetected */
+      } finally {
+        GardenApp.cocoDetectInFlight = false;
+      }
+    }
+
+    function samplePoseFromCanvas(ctx, w, h) {
+      const roiW = Math.floor(w * 0.55);
+      const roiH = Math.floor(h * 0.65);
+      const roiX = Math.floor((w - roiW) / 2);
+      const roiY = Math.floor((h - roiH) / 2);
+      const imgData = ctx.getImageData(roiX, roiY, roiW, roiH);
+      const data = imgData.data;
+
+      let skinPixels = 0;
+      let totalSamples = 0;
+      let lumaSum = 0;
+      let leftLuma = 0;
+      let rightLuma = 0;
+      let topLuma = 0;
+      let bottomLuma = 0;
+      let skinYWeightedSum = 0;
+      let skinXWeightedSum = 0;
+      let lowerThirdSkin = 0;
+      let lowerThirdSamples = 0;
+
+      for (let i = 0; i < data.length; i += 16) {
+        const r = data[i]; const g = data[i + 1]; const b = data[i + 2];
+        totalSamples++;
+        const luma = 0.299 * r + 0.587 * g + 0.114 * b;
+        lumaSum += luma;
+
+        const pixelIndex = i / 4;
+        const xInRoi = pixelIndex % roiW;
+        const yInRoi = Math.floor(pixelIndex / roiW);
+
+        if (xInRoi < roiW / 2) leftLuma += luma; else rightLuma += luma;
+        if (yInRoi < roiH / 2) topLuma += luma; else bottomLuma += luma;
+        if (yInRoi > roiH * 0.62) lowerThirdSamples++;
+
+        if (r > 60 && g > 40 && b > 20 && (r > g) && (r - g >= 12) && (r - b >= 15)) {
+          skinPixels++;
+          skinYWeightedSum += yInRoi;
+          skinXWeightedSum += xInRoi;
+          if (yInRoi > roiH * 0.62) lowerThirdSkin++;
+        }
+      }
+
+      const skinRatio = totalSamples ? skinPixels / totalSamples : 0;
+      const avgLuma = totalSamples ? lumaSum / totalSamples : 0;
+      return {
+        skinRatio,
+        avgLuma,
+        skinCenterYRatio: skinPixels > 0 ? (skinYWeightedSum / skinPixels) / roiH : 0.5,
+        skinCenterXRatio: skinPixels > 0 ? (skinXWeightedSum / skinPixels) / roiW : 0.5,
+        topToBottomLumaRatio: topLuma / (bottomLuma + 1),
+        bilateralAsymmetry: Math.abs(leftLuma - rightLuma) / (leftLuma + rightLuma + 1),
+        lowerSkinShare: lowerThirdSamples ? lowerThirdSkin / lowerThirdSamples : 0,
+        present: skinRatio > 0.08 && avgLuma > 20 && avgLuma < 240
+      };
+    }
+
+    /**
+     * Real-time gaze, calibrated posture, and phone-use analysis.
+     * Calibrate stores the current pose as 100% attention (the new normal).
+     */
+    function performRealComputerVisionAnalysis(ctx, w, h) {
+      try {
+        const sample = samplePoseFromCanvas(ctx, w, h);
+        GardenApp.lastPoseSample = sample;
+        runCocoPhoneDetection();
+
+        if (!sample.present) {
+          GardenApp.faceDetected = false;
+          GardenApp.isLookingDown = false;
+          GardenApp.isLookingAway = false;
+          GardenApp.attentionScore = Math.max(0, GardenApp.attentionScore - 20);
+          GardenApp.gazeFactor = 0;
+          GardenApp.postureFactor = 0;
+          GardenApp.drowsinessFactor = 0;
+          document.getElementById('absenceAlertBanner').classList.remove('hidden');
+          document.getElementById('phoneAlertBanner').classList.add('hidden');
+          updateAttentionScoreDisplay();
+          return;
+        }
+
+        GardenApp.faceDetected = true;
+        document.getElementById('absenceAlertBanner').classList.add('hidden');
+
+        const base = GardenApp.poseBaseline;
+        const downY = base ? (sample.skinCenterYRatio - base.skinCenterYRatio) : (sample.skinCenterYRatio - 0.48);
+        const downLuma = base ? (base.topToBottomLumaRatio - sample.topToBottomLumaRatio) : (0.95 - sample.topToBottomLumaRatio);
+        const yawDelta = base
+          ? Math.abs(sample.bilateralAsymmetry - base.bilateralAsymmetry)
+          : sample.bilateralAsymmetry;
+        const xShift = base ? Math.abs(sample.skinCenterXRatio - base.skinCenterXRatio) : 0;
+
+        const lookingDown = downY > 0.07 || downLuma > 0.18 || sample.lowerSkinShare > (base ? base.lowerSkinShare + 0.12 : 0.22);
+        const usingPhone = GardenApp.phoneDetected || lookingDown;
+        const lookingAway = !usingPhone && (yawDelta > 0.16 || xShift > 0.12);
+
+        GardenApp.isLookingDown = usingPhone;
+        GardenApp.isLookingAway = lookingAway;
+
+        if (usingPhone) {
+          GardenApp.gazeFactor = 22;
+          GardenApp.postureFactor = 34;
+          GardenApp.drowsinessFactor = 68;
+          GardenApp.switchingFactor = 40;
+          GardenApp.attentionScore = 28;
+          document.getElementById('phoneAlertBanner').classList.remove('hidden');
+          updateAttentionScoreDisplay();
+          return;
+        }
+
+        document.getElementById('phoneAlertBanner').classList.add('hidden');
+
+        if (lookingAway) {
+          GardenApp.gazeFactor = 34;
+          GardenApp.postureFactor = 52;
+          GardenApp.attentionScore = 44;
+          GardenApp.drowsinessFactor = 80;
+          updateAttentionScoreDisplay();
+          return;
+        }
+
+        const downPenalty = Math.max(0, downY) * 220;
+        const yawPenalty = yawDelta * 180;
+        const computedPosture = Math.round(Math.max(70, Math.min(100, 100 - yawPenalty - downPenalty * 0.4)));
+        const computedGaze = Math.round(Math.max(70, Math.min(100, 100 - downPenalty - yawPenalty * 0.5)));
+        GardenApp.postureFactor = computedPosture;
+        GardenApp.gazeFactor = computedGaze;
+        GardenApp.drowsinessFactor = 92;
+        GardenApp.switchingFactor = 98;
+        GardenApp.attentionScore = Math.round(
+          (GardenApp.gazeFactor * 0.4) + (GardenApp.postureFactor * 0.35) +
+          (GardenApp.drowsinessFactor * 0.15) + (GardenApp.switchingFactor * 0.1)
+        );
+        if (base) {
+          GardenApp.attentionScore = Math.max(GardenApp.attentionScore, 88);
+        }
+        updateAttentionScoreDisplay();
+      } catch (err) {
+        console.warn('Vision analysis error:', err);
+      }
+    }
+
+    function updateAttentionScoreDisplay() {
+      const s = GardenApp.attentionScore;
+      document.getElementById('attentionScoreNumber').innerText = s;
+      const offset = 141.37 - (s / 100) * 141.37;
+      const arc = document.getElementById('gaugeArcFill');
+      arc.style.strokeDashoffset = offset;
+
+      const fullLabel = document.getElementById('attentionScoreFullText');
+      const badge = document.getElementById('attentionClassificationBadge');
+      const presenceText = document.getElementById('presenceStatusText');
+      const deskAttention = document.getElementById('deskModeAttentionVal');
+      if (deskAttention) deskAttention.innerText = `${s}%`;
+
+      if (!GardenApp.faceDetected) {
+        arc.setAttribute('stroke', '#ef4444');
+        fullLabel.innerText = `${s} / 100 - USER ABSENT`;
+        badge.innerText = 'USER ABSENT';
+        badge.className = 'text-[11px] font-mono font-bold px-2.5 py-0.5 rounded-full bg-red-100 text-red-700 border border-red-300 animate-pulse';
+        document.getElementById('overlayGazeText').innerText = 'Gaze: No Face Detected';
+        document.getElementById('overlayPostureText').innerText = 'Posture: User Absent';
+        presenceText.innerText = 'Face: Not in Frame';
+        presenceText.className = 'text-red-600 font-bold';
+      } else if (GardenApp.isLookingDown) {
+        arc.setAttribute('stroke', '#f59e0b');
+        fullLabel.innerText = `${s} / 100 - DISTRACTION`;
+        badge.innerText = 'DISTRACTION';
+        badge.className = 'text-[11px] font-mono font-bold px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-800 border border-amber-300';
+        document.getElementById('overlayGazeText').innerText = 'Distraction';
+        document.getElementById('overlayPostureText').innerText = 'Posture: Slouching Forward';
+        presenceText.innerText = 'Distraction';
+        presenceText.className = 'text-amber-700 font-bold';
+      } else if (GardenApp.isLookingAway) {
+        arc.setAttribute('stroke', '#f59e0b');
+        fullLabel.innerText = `${s} / 100 - DISTRACTION`;
+        badge.innerText = 'DISTRACTION';
+        badge.className = 'text-[11px] font-mono font-bold px-2.5 py-0.5 rounded-full bg-yellow-100 text-yellow-800 border border-yellow-300';
+        document.getElementById('overlayGazeText').innerText = 'Distraction';
+        document.getElementById('overlayPostureText').innerText = 'Posture: Head Rotated';
+        presenceText.innerText = 'Distraction';
+        presenceText.className = 'text-yellow-700 font-bold';
+      } else if (s >= 80) {
+        arc.setAttribute('stroke', '#778673');
+        fullLabel.innerText = `${s} / 100 - HIGH FOCUS`; badge.innerText = 'HIGH FOCUS';
+        badge.className = 'text-[11px] font-mono font-bold px-2.5 py-0.5 rounded-full bg-court-tint text-court-lawn border border-court-line';
+        document.getElementById('overlayGazeText').innerText = 'Gaze: Focused Center';
+        document.getElementById('overlayPostureText').innerText = 'Posture: Upright';
+        presenceText.innerText = 'State: Focused on Screen';
+        presenceText.className = 'text-court-lawn font-bold';
+      } else {
+        arc.setAttribute('stroke', '#c9a66b');
+        fullLabel.innerText = `${s} / 100 - MODERATE FOCUS`; badge.innerText = 'MODERATE';
+        badge.className = 'text-[11px] font-mono font-bold px-2.5 py-0.5 rounded-full bg-yellow-50 text-yellow-800 border border-yellow-200';
+        presenceText.innerText = 'State: Mild Drift';
+        presenceText.className = 'text-yellow-700 font-bold';
+      }
+
+      document.getElementById('gazeFactorValue').innerText = `${GardenApp.gazeFactor}%`;
+      document.getElementById('gazeFactorBar').style.width = `${GardenApp.gazeFactor}%`;
+      document.getElementById('postureFactorValue').innerText = `${GardenApp.postureFactor}%`;
+      document.getElementById('postureFactorBar').style.width = `${GardenApp.postureFactor}%`;
+      document.getElementById('drowsinessFactorValue').innerText = `${GardenApp.drowsinessFactor}%`;
+      document.getElementById('drowsinessFactorBar').style.width = `${GardenApp.drowsinessFactor}%`;
+      document.getElementById('switchingFactorValue').innerText = `${GardenApp.switchingFactor}%`;
+      document.getElementById('switchingFactorBar').style.width = `${GardenApp.switchingFactor}%`;
+      document.getElementById('fatigueMeterBar').style.width = `${GardenApp.drowsinessFactor}%`;
+    }
+
+    function calibrateBaselinePose() {
+      if (!GardenApp.isWebcamStreaming) {
+        showToast('Enable Camera First', 'Turn on the live camera, sit in your normal study pose, then tap Calibrate.', 'fa-video');
+        return;
+      }
+      if (!GardenApp.lastPoseSample || !GardenApp.lastPoseSample.present) {
+        showToast('No Face Detected', 'Look at the camera in your usual study posture, then tap Calibrate again.', 'fa-user');
+        return;
+      }
+      GardenApp.poseBaseline = { ...GardenApp.lastPoseSample };
+      GardenApp.isLookingDown = false;
+      GardenApp.isLookingAway = false;
+      GardenApp.phoneDetected = false;
+      GardenApp.gazeFactor = 100;
+      GardenApp.postureFactor = 100;
+      GardenApp.drowsinessFactor = 100;
+      GardenApp.switchingFactor = 100;
+      GardenApp.attentionScore = 100;
+      try { localStorage.setItem('study_garden_pose_baseline', JSON.stringify(GardenApp.poseBaseline)); } catch (e) {}
+      updateAttentionScoreDisplay();
+      showToast('Baseline Calibrated', 'Current pose is now 100% attention. Any distraction will drop the meter.');
+    }
+
+    // --- REAL IN-APP PDF & DOCUMENT STORAGE & VIEWER ---
+    const STORAGE_KEY = 'study_garden_user_files_v2';
+    function initLocalFileStorage() {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        try { GardenApp.localFiles = JSON.parse(saved); } catch (e) { GardenApp.localFiles = []; }
+      }
+      renderLocalFilesDOM();
+    }
+
+    function renderLocalFilesDOM() {
+      const cont = document.getElementById('localFileStorageList');
+      if (!cont) return;
+      if (GardenApp.localFiles.length === 0) {
+        cont.innerHTML = `<div class="py-5 px-4 text-center rounded-xl bg-court-tint/40 border border-dashed border-court-line"><i class="fa-regular fa-folder-open text-court-dark/40 text-2xl mb-1"></i><p class="text-xs font-semibold text-court-deep">No documents stored</p><p class="text-[10px] text-court-dark/60">Click "Add PDF / Word File" to pick documents from your PC.</p></div>`;
+        return;
+      }
+      let html = '';
+      GardenApp.localFiles.forEach((f, i) => {
+        if (f.type === 'folder') {
+          const docCount = (f.folderFiles || []).length;
+          html += `
+            <div class="flex items-center justify-between p-2.5 rounded-xl bg-white border border-court-border hover:border-court-line hover:shadow-xs transition">
+              <div class="flex items-center gap-3 truncate mr-2">
+                <span class="w-8 h-8 rounded-lg bg-court-tint flex items-center justify-center text-sm shrink-0 border border-court-line">
+                  <i class="fa-solid fa-folder text-amber-500"></i>
+                </span>
+                <div class="truncate">
+                  <div class="text-xs font-bold text-court-deep truncate">${f.name}</div>
+                  <div class="text-[10px] text-court-dark/60 font-mono truncate">${docCount} PDF/Word doc${docCount === 1 ? '' : 's'} found • ${f.path || 'Linked Folder'}</div>
+                </div>
+              </div>
+              <div class="flex items-center gap-1.5 shrink-0">
+                <button onclick="openFolderViewer(${i})" class="px-2.5 py-1 rounded-lg bg-court-lawn hover:bg-court-dark text-white text-[11px] font-bold transition flex items-center gap-1 shadow-xs">
+                  <i class="fa-solid fa-folder-open text-[9px] text-court-accent"></i>
+                  <span>View Folder</span>
+                </button>
+                <button onclick="removeLocalFile(${i})" class="p-1.5 rounded-lg text-court-dark/60 hover:text-red-600 hover:bg-red-50 text-xs transition" title="Delete">
+                  <i class="fa-regular fa-trash-can"></i>
+                </button>
+              </div>
+            </div>
+          `;
+          return;
+        }
+
+        const isPdf = f.name.toLowerCase().endsWith('.pdf');
+        const isDoc = f.name.toLowerCase().includes('.doc');
+        const iconClass = isPdf ? 'fa-file-pdf text-red-600' : (isDoc ? 'fa-file-word text-blue-600' : 'fa-file-lines text-court-lawn');
+
+        html += `
+          <div class="flex items-center justify-between p-2.5 rounded-xl bg-white border border-court-border hover:border-court-line hover:shadow-xs transition">
+            <div class="flex items-center gap-3 truncate mr-2">
+              <span class="w-8 h-8 rounded-lg bg-court-tint flex items-center justify-center text-sm shrink-0 border border-court-line">
+                <i class="fa-solid ${iconClass}"></i>
+              </span>
+              <div class="truncate">
+                <div class="text-xs font-bold text-court-deep truncate">${f.name} <span class="text-[9px] font-mono text-court-dark/60 font-normal">(${f.size})</span></div>
+                <div class="text-[10px] text-court-dark/60 font-mono truncate">${f.path || 'In-App Sandbox Storage'}</div>
+              </div>
+            </div>
+            <div class="flex items-center gap-1.5 shrink-0">
+              <button onclick="openDocumentInViewer(${i})" class="px-2.5 py-1 rounded-lg bg-court-lawn hover:bg-court-dark text-white text-[11px] font-bold transition flex items-center gap-1 shadow-xs">
+                <i class="fa-solid fa-book-open text-[9px] text-court-accent"></i>
+                <span>Open / View</span>
+              </button>
+              <button onclick="copyFilePath(${i})" class="p-1.5 rounded-lg text-court-dark/60 hover:text-court-deep hover:bg-court-tint text-xs transition" title="Copy Path">
+                <i class="fa-regular fa-copy"></i>
+              </button>
+              <button onclick="removeLocalFile(${i})" class="p-1.5 rounded-lg text-court-dark/60 hover:text-red-600 hover:bg-red-50 text-xs transition" title="Delete">
+                <i class="fa-regular fa-trash-can"></i>
+              </button>
+            </div>
+          </div>
+        `;
+      });
+      cont.innerHTML = html;
+    }
+
+    // Handle real file upload & store DataURL
+    function handleRealFileSelect(event) {
+      const files = event.target.files;
+      if (!files || files.length === 0) return;
+
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        const reader = new FileReader();
+        const sizeStr = file.size > 1024 * 1024 ? `${(file.size / (1024 * 1024)).toFixed(1)} MB` : `${Math.round(file.size / 1024)} KB`;
+
+        reader.onload = function(e) {
+          const dataUrl = e.target.result;
+          const entry = {
+            id: Date.now() + Math.random(),
+            name: file.name,
+            size: sizeStr,
+            type: file.type || 'application/octet-stream',
+            dataUrl: dataUrl,
+            path: `C:\\Users\\Study\\Documents\\${file.name}`,
+            addedAt: Date.now()
+          };
+          GardenApp.localFiles.unshift(entry);
+          try {
+            // Store up to storage quota
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(GardenApp.localFiles));
+          } catch (storageErr) {
+            console.warn('Storage quota limit reached for full dataURL. Stored in memory session.');
+          }
+          renderLocalFilesDOM();
+          showToast('Document Registered', `"${file.name}" ready to open in reader.`);
+        };
+
+        reader.readAsDataURL(file);
+      }
+    }
+
+    function handleNativeFolderSelect(event) {
+      const files = Array.from(event.target.files || []);
+      if (files.length === 0) return;
+      const folderName = files[0].webkitRelativePath ? files[0].webkitRelativePath.split('/')[0] : 'Study_Folder';
+
+      // Only keep PDFs and Word docs from within the linked folder
+      const docFiles = files.filter(f => /\.(pdf|docx?|doc)$/i.test(f.name));
+
+      showToast('Scanning Folder', `Reading PDFs & Word docs from "${folderName}"...`, 'fa-magnifying-glass');
+
+      const readAsDataUrl = (file) => new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onload = (e) => resolve(e.target.result);
+        reader.onerror = () => resolve(null);
+        reader.readAsDataURL(file);
+      });
+
+      Promise.all(docFiles.map(readAsDataUrl)).then(dataUrls => {
+        const folderFiles = docFiles.map((file, idx) => {
+          const sizeStr = file.size > 1024 * 1024 ? `${(file.size / (1024 * 1024)).toFixed(1)} MB` : `${Math.round(file.size / 1024)} KB`;
+          return {
+            name: file.name,
+            size: sizeStr,
+            type: file.type || 'application/octet-stream',
+            dataUrl: dataUrls[idx],
+            path: `C:\\Users\\Documents\\${folderName}\\${file.name}`
+          };
+        });
+
+        GardenApp.localFiles.unshift({
+          id: Date.now(),
+          type: 'folder',
+          name: `📁 ${folderName}`,
+          path: `C:\\Users\\Documents\\${folderName}`,
+          folderFiles: folderFiles,
+          addedAt: Date.now()
+        });
+        renderLocalFilesDOM();        showToast('Folder Linked', `"${folderName}" added as a shortcut — ${folderFiles.length} PDF/Word doc${folderFiles.length === 1 ? '' : 's'} found.`);
+      });
+    }
+
+    // --- FOLDER SHORTCUT VIEWER: shows only PDFs & Word docs inside a linked folder ---
+    function openFolderViewer(folderIndex) {
+      const folder = GardenApp.localFiles[folderIndex];
+      if (!folder || folder.type !== 'folder') return;
+      GardenApp.activeFolderIndex = folderIndex;
+
+      document.getElementById('folderViewerTitle').innerText = folder.name;
+      document.getElementById('folderViewerMeta').innerText = folder.path || 'Linked Folder';
+
+      const list = document.getElementById('folderViewerFileList');
+      const files = folder.folderFiles || [];
+      if (files.length === 0) {
+        list.innerHTML = `<div class="py-6 text-center text-xs text-court-dark/60"><i class="fa-regular fa-folder-open text-2xl mb-2 block"></i>No PDF or Word documents found in this folder.</div>`;
+      } else {
+        list.innerHTML = files.map((f, i) => {
+          const isPdf = f.name.toLowerCase().endsWith('.pdf');
+          const iconClass = isPdf ? 'fa-file-pdf text-red-600' : 'fa-file-word text-blue-600';
+          return `
+            <div class="flex items-center justify-between p-2.5 rounded-xl bg-white border border-court-border hover:border-court-line transition">
+              <div class="flex items-center gap-3 truncate mr-2">
+                <span class="w-8 h-8 rounded-lg bg-court-tint flex items-center justify-center text-sm shrink-0 border border-court-line"><i class="fa-solid ${iconClass}"></i></span>
+                <div class="truncate">
+                  <div class="text-xs font-bold text-court-deep truncate">${f.name}</div>
+                  <div class="text-[10px] text-court-dark/60 font-mono truncate">${f.size}</div>
+                </div>
+              </div>
+              <button onclick="openFolderFileInViewer(${i})" class="px-2.5 py-1 rounded-lg bg-court-lawn hover:bg-court-dark text-white text-[11px] font-bold transition flex items-center gap-1 shadow-xs shrink-0">
+                <i class="fa-solid fa-book-open text-[9px] text-court-accent"></i><span>Open</span>
+              </button>
+            </div>
+          `;
+        }).join('');
+      }
+      document.getElementById('folderViewerModal').classList.remove('hidden');
+    }
+
+    function closeFolderViewerModal() {
+      document.getElementById('folderViewerModal').classList.add('hidden');
+    }
+
+    function openFolderFileInViewer(fileIndex) {
+      const folder = GardenApp.localFiles[GardenApp.activeFolderIndex];
+      if (!folder) return;
+      const file = folder.folderFiles[fileIndex];
+      if (!file) return;
+      GardenApp.activeViewingDoc = file;
+
+      const modal = document.getElementById('docViewerModal');
+      const title = document.getElementById('docViewerTitle');
+      const meta = document.getElementById('docViewerMeta');
+      const iframe = document.getElementById('pdfViewerFrame');
+      const textBox = document.getElementById('textDocViewerBox');
+      const fallbackBox = document.getElementById('docViewerFallbackNotice');
+
+      title.innerText = file.name;
+      meta.innerText = `${file.size} • ${file.path || 'In-App Sandbox'}`;
+      iframe.classList.add('hidden');
+      textBox.classList.add('hidden');
+      fallbackBox.classList.add('hidden');
+
+      if (file.dataUrl && file.name.toLowerCase().endsWith('.pdf')) {
+        iframe.src = file.dataUrl;
+        iframe.classList.remove('hidden');
+      } else {
+        document.getElementById('fallbackDocName').innerText = file.name;
+        fallbackBox.classList.remove('hidden');
+      }
+
+      modal.classList.remove('hidden');
+    }
+
+    function addNewLocalFilePath() {
+      const inp = document.getElementById('manualPathInput');
+      const val = inp.value.trim();
+      if (!val) { showToast('Path Missing', 'Please enter a valid file path.', 'fa-circle-exclamation'); return; }
+      const clean = val.replace(/["']/g, '');
+      const name = clean.split(/[\\/]/).pop() || clean;
+      GardenApp.localFiles.unshift({ id: Date.now(), name, path: clean, size: 'Path', dataUrl: null, addedAt: Date.now() });
+      inp.value = '';
+      renderLocalFilesDOM();      showToast('Path Registered', `Saved: "${name}"`);
+    }
+
+    function openDocumentInViewer(index) {
+      const file = GardenApp.localFiles[index];
+      if (!file) return;
+      GardenApp.activeViewingDoc = file;
+
+      const modal = document.getElementById('docViewerModal');
+      const title = document.getElementById('docViewerTitle');
+      const meta = document.getElementById('docViewerMeta');
+      const iframe = document.getElementById('pdfViewerFrame');
+      const textBox = document.getElementById('textDocViewerBox');
+      const fallbackBox = document.getElementById('docViewerFallbackNotice');
+
+      title.innerText = file.name;
+      meta.innerText = `${file.size} • ${file.path || 'In-App Sandbox'}`;
+
+      iframe.classList.add('hidden');
+      textBox.classList.add('hidden');
+      fallbackBox.classList.add('hidden');
+
+      if (file.dataUrl && file.name.toLowerCase().endsWith('.pdf')) {
+        // Embed PDF Viewer
+        iframe.src = file.dataUrl;
+        iframe.classList.remove('hidden');
+      } else if (file.dataUrl && (file.name.toLowerCase().endsWith('.txt') || file.name.toLowerCase().endsWith('.md'))) {
+        try {
+          const rawText = atob(file.dataUrl.split(',')[1]);
+          textBox.innerText = rawText;
+          textBox.classList.remove('hidden');
+        } catch(e) {
+          fallbackBox.classList.remove('hidden');
+        }
+      } else {
+        // Fallback for Word .docx or paths without direct dataUrl
+        document.getElementById('fallbackDocName').innerText = file.name;
+        fallbackBox.classList.remove('hidden');
+      }
+
+      modal.classList.remove('hidden');
+    }
+
+    function closeDocViewerModal() {
+      document.getElementById('docViewerModal').classList.add('hidden');
+      document.getElementById('pdfViewerFrame').src = '';
+    }
+
+    function openDocInNewTab() {
+      if (GardenApp.activeViewingDoc && GardenApp.activeViewingDoc.dataUrl) {
+        window.open(GardenApp.activeViewingDoc.dataUrl, '_blank');
+      } else if (GardenApp.activeViewingDoc) {
+        showToast('Local Path', `Path copied to clipboard: ${GardenApp.activeViewingDoc.path}`);
+        navigator.clipboard.writeText(GardenApp.activeViewingDoc.path);
+      }
+    }
+
+    function downloadActiveDoc() {
+      if (GardenApp.activeViewingDoc && GardenApp.activeViewingDoc.dataUrl) {
+        const a = document.createElement('a');
+        a.href = GardenApp.activeViewingDoc.dataUrl;
+        a.download = GardenApp.activeViewingDoc.name;
+        a.click();
+      } else if (GardenApp.activeViewingDoc) {
+        navigator.clipboard.writeText(GardenApp.activeViewingDoc.path);
+        showToast('Path Copied', GardenApp.activeViewingDoc.path);
+      }
+    }
+
+    function copyFilePath(idx) {
+      const f = GardenApp.localFiles[idx]; if (!f) return;
+      navigator.clipboard.writeText(f.path || f.name).then(() => { showToast('Copied to Clipboard', f.path || f.name, 'fa-copy'); });
+    }
+
+    function removeLocalFile(idx) {
+      GardenApp.localFiles.splice(idx, 1);
+      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(GardenApp.localFiles)); } catch(e){}
+      renderLocalFilesDOM();
+    }
+
+    function clearAllLocalFiles() {
+      if (confirm('Clear all stored documents?')) {
+        GardenApp.localFiles = [];
+        try { localStorage.removeItem(STORAGE_KEY); } catch(e){}
+        renderLocalFilesDOM(); showToast('Storage Cleared', 'All stored files cleansed.');
+      }
+    }
+
+    // --- STUDY FEATURES: FULL-SCREEN DESK MODE, TASKS, TIMELINE, SUBJECTS ---
+    function toggleDeskMode() {
+      const overlay = document.getElementById('deskModeOverlay');
+      const opening = overlay.classList.contains('hidden');
+      overlay.classList.toggle('hidden');
+      if (opening) {
+        document.getElementById('deskModeSubject').innerText = `${GardenApp.activeSubjectIcon} ${GardenApp.activeSubject}`;
+        document.getElementById('deskModeTimerDigits').innerText = formatClockTime(GardenApp.remainingSecs);
+        document.getElementById('deskModeContinuousVal').innerText = document.getElementById('continuousFocusLabel').innerText;
+        document.getElementById('deskModeMotto').innerText = document.getElementById('dailyMottoText').innerText;
+        const req = overlay.requestFullscreen || overlay.webkitRequestFullscreen || overlay.msRequestFullscreen;
+        if (req) { req.call(overlay).catch(() => {}); }
+      } else {
+        const exit = document.exitFullscreen || document.webkitExitFullscreen || document.msExitFullscreen;
+        if (exit && (document.fullscreenElement || document.webkitFullscreenElement)) {
+          exit.call(document).catch(() => {});
+        }
+      }
+    }
+
+    // If the browser's fullscreen state is exited another way (e.g. Esc key), keep Desk Mode in sync
+    document.addEventListener('fullscreenchange', () => {
+      const overlay = document.getElementById('deskModeOverlay');
+      if (!overlay) return;
+      const isFs = !!document.fullscreenElement;
+      if (!isFs && !overlay.classList.contains('hidden')) {
+        overlay.classList.add('hidden');
+      }
+    });
+
+    function editDailyMotto() {
+      const current = document.getElementById('dailyMottoText').innerText.replace(/"/g, '');
+      const next = prompt('Enter your daily study motto:', current);
+      if (next) {
+        document.getElementById('dailyMottoText').innerText = `"${next}"`;
+        showToast('Motto Updated', 'New study inspiration active.');
+      }
+    }
+
+    function renderStudyTasksDOM() {
+      const cont = document.getElementById('taskListContainer');
+      if (!cont) return;
+      let html = '';
+      let doneCount = 0;
+      GardenApp.studyTasks.forEach((t, i) => {
+        if (t.done) doneCount++;
+        const strike = t.done ? 'line-through text-court-dark/50' : 'text-court-deep font-bold';
+        const checked = t.done ? 'checked' : '';
+        html += `
+          <div class="flex items-center justify-between p-2 rounded-xl bg-court-surface border border-court-border">
+            <label class="flex items-center gap-2.5 truncate cursor-pointer select-none">
+              <input type="checkbox" onchange="toggleStudyTask(${i})" ${checked} class="rounded text-court-lawn focus:ring-court-lawn">
+              <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-white border border-court-line font-bold">${t.subject}</span>
+              <span class="text-xs truncate ${strike}">${t.title}</span>
+            </label>
+            <button onclick="removeStudyTask(${i})" class="text-court-dark/40 hover:text-red-600 p-1"><i class="fa-solid fa-xmark text-xs"></i></button>
+          </div>
+        `;
+      });
+      cont.innerHTML = html;
+      const pct = Math.round((doneCount / (GardenApp.studyTasks.length || 1)) * 100);
+      document.getElementById('taskProgressBadge').innerText = `Progress: ${doneCount}/${GardenApp.studyTasks.length} (${pct}%)`;
+    }
+
+    function toggleStudyTask(index) {
+      GardenApp.studyTasks[index].done = !GardenApp.studyTasks[index].done;
+      renderStudyTasksDOM();
+    }
+
+    function addStudyTask() {
+      const sub = document.getElementById('newTaskSubjectSelect').value;
+      const inp = document.getElementById('newTaskTitleInput');
+      const title = inp.value.trim();
+      if (!title) return;
+      GardenApp.studyTasks.push({ id: Date.now(), subject: sub, title: title, done: false });
+      inp.value = '';
+      renderStudyTasksDOM();
+      showToast('Task Added', `Added to study planner: "${title}"`);
+    }
+
+    function removeStudyTask(index) {
+      GardenApp.studyTasks.splice(index, 1);
+      renderStudyTasksDOM();
+    }
+
+    function selectStudySubject(name, icon, color) {
+      GardenApp.activeSubject = name;
+      GardenApp.activeSubjectIcon = icon;
+      GardenApp.activeSubjectColor = color;
+      document.getElementById('activeSubjectLabel').innerText = `${icon} ${name}`;
+      document.getElementById('peerUserSubject').innerText = `${icon} ${name}`;
+      renderSubjectPills();
+      showToast('Subject Switched', `Active subject set to ${icon} ${name}.`);
+    }
+
+    const SUBJECTS_KEY = 'study_garden_subjects_v1';
+
+    function persistSubjectsList() {
+      try { localStorage.setItem(SUBJECTS_KEY, JSON.stringify(GardenApp.subjectsList)); } catch (e) {}
+    }
+
+    function loadPersistedSubjectsList() {
+      try {
+        const raw = localStorage.getItem(SUBJECTS_KEY);
+        if (!raw) return;
+        const parsed = JSON.parse(raw);
+        const OLD_TO_NEW = { '#15803d': '#778673', '#14532d': '#5f6e5b', '#22c55e': '#8fa88b', '#0f766e': '#5f8a86', '#4d7c0f': '#d57d57', '#166534': '#a5bda1', '#65a30d': '#c9a66b', '#0d9488': '#7aa3a0' };
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          parsed.forEach(p => { if (p && OLD_TO_NEW[p.color]) p.color = OLD_TO_NEW[p.color]; });
+          GardenApp.subjectsList = parsed;
+        }
+      } catch (e) {}
+      if (!GardenApp.subjectsList.some(s => s.name === GardenApp.activeSubject)) {
+        const first = GardenApp.subjectsList[0];
+        GardenApp.activeSubject = first.name;
+        GardenApp.activeSubjectIcon = first.icon;
+        GardenApp.activeSubjectColor = first.color;
+        setElText('activeSubjectLabel', `${first.icon} ${first.name}`);
+        setElText('peerUserSubject', `${first.icon} ${first.name}`);
+      }
+      GardenApp.subjectsList.forEach(s => {
+        if (GardenApp.subjectTimes[s.name] === undefined) GardenApp.subjectTimes[s.name] = 0;
+        if (!GardenApp.matrixGridBySubject[s.name]) {
+          GardenApp.matrixGridBySubject[s.name] = Array.from({ length: 24 }, () => Array(30).fill(0));
+        }
+      });
+    }
+
+    // Renders the Study Timer subject pills, each with a small remove (×) control, plus a trailing "+ Add" pill
+    function renderSubjectPills() {
+      const cont = document.getElementById('subjectPills');
+      if (!cont) return;
+      let html = GardenApp.subjectsList.map(s => {
+        const isActive = s.name === GardenApp.activeSubject;
+        const pillClass = isActive
+          ? 'px-2 py-0.5 rounded-lg text-[10px] font-bold bg-court-lawn text-white border border-court-dark whitespace-nowrap shadow-2xs'
+          : 'px-2 py-0.5 rounded-lg text-[10px] font-semibold bg-white text-court-deep border border-court-border hover:bg-court-tint whitespace-nowrap';
+        const closeClass = isActive ? 'text-white/70 hover:text-white' : 'text-court-dark/40 hover:text-red-600';
+        return `
+          <span class="inline-flex items-center gap-1 ${isActive ? 'bg-court-lawn border border-court-dark' : 'bg-white border border-court-border hover:bg-court-tint'} rounded-lg whitespace-nowrap">
+            <button onclick="selectStudySubject('${s.name}', '${s.icon}', '${s.color}')" class="px-2 py-0.5 rounded-lg text-[10px] ${isActive ? 'font-bold text-white' : 'font-semibold text-court-deep'} whitespace-nowrap">${s.icon} ${s.name}</button>
+            <button onclick="removeSubjectPrompt('${s.name}')" class="pr-1.5 ${closeClass} transition" title="Remove ${s.name}"><i class="fa-solid fa-xmark text-[9px]"></i></button>
+          </span>
+        `;
+      }).join('');
+      html += `<button onclick="addNewSubject()" class="px-2 py-0.5 rounded-lg text-[10px] font-bold bg-court-tint text-court-lawn border border-dashed border-court-line hover:bg-court-line/40 whitespace-nowrap" title="Add a new subject"><i class="fa-solid fa-plus"></i> Add</button>`;
+      cont.innerHTML = html;
+    }
+
+    // Renders the "Today's Subject Distribution" mini-bar badges from the current subject list
+    function renderSubjectDistBadges() {
+      const cont = document.getElementById('SubjectDistBadges');
+      if (!cont) return;
+      cont.innerHTML = GardenApp.subjectsList.map(s => {
+        const mins = Math.floor((GardenApp.subjectTimes[s.name] || 0) / 60);
+        return `<span>${s.icon} ${s.name}: <strong id="dist-${s.name}">${mins}m</strong></span>`;
+      }).join('');
+    }
+
+    // Renders the subject <option> list for the new-task form
+    function renderTaskSubjectOptions() {
+      const sel = document.getElementById('newTaskSubjectSelect');
+      if (!sel) return;
+      sel.innerHTML = GardenApp.subjectsList.map(s => `<option value="${s.icon} ${s.name}">${s.icon} ${s.name}</option>`).join('');
+    }
+
+    function renderAllSubjectUI() {
+      renderSubjectPills();
+      renderSubjectDistBadges();
+      renderTaskSubjectOptions();
+      renderHeatmapSubjectTabs();
+    }
+
+    function addNewSubject() {
+      const name = prompt('Enter new subject name (e.g. Chemistry):');
+      if (!name || !name.trim()) return;
+      const cleanName = name.trim();
+      if (GardenApp.subjectsList.some(s => s.name.toLowerCase() === cleanName.toLowerCase())) {
+        showToast('Subject Exists', `"${cleanName}" is already in your subject list.`, 'fa-circle-exclamation');
+        return;
+      }
+      const icon = prompt('Pick an emoji icon for this subject (e.g. 🧪):', '📘') || '📘';
+      const palette = ['#778673', '#5f6e5b', '#8fa88b', '#5f8a86', '#d57d57', '#a5bda1', '#c9a66b', '#7aa3a0'];
+      const color = palette[GardenApp.subjectsList.length % palette.length];
+
+      GardenApp.subjectsList.push({ name: cleanName, icon: icon, color: color });
+      GardenApp.subjectTimes[cleanName] = 0;
+      GardenApp.matrixGridBySubject[cleanName] = Array.from({ length: 24 }, () => Array(30).fill(0));
+      persistSubjectsList();
+      persistHeatmap();
+      renderAllSubjectUI();
+      showToast('Subject Added', `${icon} ${cleanName} added to your subject list.`);
+    }
+
+    function removeSubjectPrompt(name) {
+      if (GardenApp.subjectsList.length <= 1) {
+        showToast('Cannot Remove', 'You need at least one subject.', 'fa-circle-exclamation');
+        return;
+      }
+      if (!confirm(`Remove "${name}" from your subjects? Its saved study time and heatmap data will be deleted.`)) return;
+
+      GardenApp.subjectsList = GardenApp.subjectsList.filter(s => s.name !== name);
+      delete GardenApp.subjectTimes[name];
+      delete GardenApp.matrixGridBySubject[name];
+
+      if (GardenApp.activeSubject === name) {
+        const next = GardenApp.subjectsList[0];
+        GardenApp.activeSubject = next.name;
+        GardenApp.activeSubjectIcon = next.icon;
+        GardenApp.activeSubjectColor = next.color;
+        setElText('activeSubjectLabel', `${next.icon} ${next.name}`);
+        setElText('peerUserSubject', `${next.icon} ${next.name}`);
+      }
+      if (GardenApp.heatmapView === name) {
+        GardenApp.heatmapView = 'Overall';
+      }
+
+      persistSubjectsList();
+      persistHeatmap();
+      renderAllSubjectUI();
+      renderMatrixGridDOM();
+      recalculateAnalyticsMetrics();
+      showToast('Subject Removed', `"${name}" removed from your subject list.`);
+    }
+
+    function initStudyTimeline() {
+      const cont = document.getElementById('TimelineBlocks') || document.getElementById('studyTimelineBlocksFallback');
+      if (!cont) return;
+      cont.innerHTML = '';
+      for (let i = 0; i < 144; i++) {
+        const div = document.createElement('div');
+        div.id = `study-block-${i}`;
+        div.className = 'w-full h-full rounded-[1px] bg-white border border-court-border/30 hover:opacity-80 transition-colors';
+        const hr = Math.floor(i / 6); const min = (i % 6) * 10;
+        div.title = `${hr < 10 ? '0' + hr : hr}:${min === 0 ? '00' : min} - Unstudied`;
+        cont.appendChild(div);
+      }
+    }
+
+    function updateStudyTimelineLive() {
+      const now = new Date();
+      const hr = now.getHours();
+      const min = now.getMinutes();
+      const blockIndex = hr * 6 + Math.floor(min / 10);
+
+      if (blockIndex >= 0 && blockIndex < 144) {
+        GardenApp.studyTimelineArr[blockIndex] = GardenApp.activeSubjectColor;
+        const block = document.getElementById(`study-block-${blockIndex}`);
+        if (block) {
+          block.style.backgroundColor = GardenApp.activeSubjectColor;
+          block.title = `${hr < 10 ? '0' + hr : hr}:${Math.floor(min / 10) * 10} - ${GardenApp.activeSubject}`;
+        }
+      }
+
+      if (GardenApp.subjectTimes[GardenApp.activeSubject] === undefined) {
+        GardenApp.subjectTimes[GardenApp.activeSubject] = 0;
+      }
+      GardenApp.subjectTimes[GardenApp.activeSubject] += 1;
+
+      const subM = Math.floor((GardenApp.subjectTimes[GardenApp.activeSubject] || 0) / 60);
+      const distEl = document.getElementById(`dist-${GardenApp.activeSubject}`);
+      if (distEl) distEl.innerText = `${subM}m`;
+
+      const totalM = Math.floor(GardenApp.todayStudySeconds / 60);
+      const str = totalM > 60 ? `${(totalM / 60).toFixed(1)}h (${totalM}m)` : `${totalM}m`;
+      setElText('TodayTimelineSum', str);
+      setElText('studyTodayTimelineSum', str);
+      setElText('peerUserTodaySum', str);
+    }
+
+    function renderDDayBadges() {
+      const cont = document.getElementById('ddayBadgeContainer');
+      if (!cont) return;
+      cont.innerHTML = GardenApp.ddayList.map((d, i) => `
+        <span class="flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-white border border-court-line font-bold text-court-lawn">
+          ${d.name}: <strong class="text-red-600">D-${d.days}</strong>
+          <button onclick="removeDDay(${i})" class="text-court-dark/50 hover:text-red-600 transition" title="Remove ${d.name}"><i class="fa-solid fa-xmark text-[10px]"></i></button>
+        </span>
+      `).join('');
+    }
+
+    function promptAddDDay() {
+      const examName = prompt('Enter Exam or Milestone Name (e.g. Physics Midterm):');
+      if (!examName) return;
+      const daysStr = prompt('Enter days remaining until exam (e.g. 14):', '14');
+      if (!daysStr) return;
+      const days = parseInt(daysStr, 10);
+      if (isNaN(days) || days < 0) return;
+      GardenApp.ddayList.push({ name: examName, days: days });
+      renderDDayBadges();
+      showToast('D-Day Added', `${examName} countdown created!`);
+    }
+
+    function removeDDay(index) {
+      const d = GardenApp.ddayList[index];
+      if (!d) return;
+      GardenApp.ddayList.splice(index, 1);
+      renderDDayBadges();
+      showToast('D-Day Removed', `${d.name} countdown removed.`);
+    }
+
+    function promptEditStudyGoal() {
+      const current = GardenApp.dailyStudyGoalHours;
+      const input = prompt('Set your daily study goal (in hours, e.g. 6):', current);
+      if (input === null) return;
+      const parsed = parseFloat(input);
+      if (!isNaN(parsed) && parsed > 0 && parsed <= 24) {
+        GardenApp.dailyStudyGoalHours = parsed;
+        localStorage.setItem('study_garden_daily_goal_hours', parsed.toString());
+        setElText('GoalTargetText', `${parsed.toFixed(1)}h`);
+        showToast('Goal Updated', `Daily study goal set to ${parsed.toFixed(1)} hours.`);
+      } else {
+        showToast('Invalid Goal', 'Please enter a number between 0 and 24 hours.', 'fa-circle-exclamation');
+      }
+    }
+
+    // --- HARD OVERRIDE #4: EDITABLE FOCUS GUARD LOCK ---
+    const FOCUS_GUARD_EDIT_PASSWORD = '1234';
+
+    function promptEditFocusGuardLock() {
+      const pass = prompt('Enter password to change the Break & Relaxation lock time:');
+      if (pass === null) return; // cancelled
+      if (pass !== FOCUS_GUARD_EDIT_PASSWORD) {
+        showToast('Incorrect Password', 'That password is not correct. Lock time was not changed.', 'fa-lock');
+        return;
+      }
+      const currentMins = Math.round(GardenApp.focusGuardThresholdSecs / 60);
+      const input = prompt(`Edit required continuous focus time to unlock Focus Guard (minutes):`, currentMins);
+      if (input !== null) {
+        const parsed = parseFloat(input);
+        if (!isNaN(parsed) && parsed > 0 && parsed <= 240) {
+          GardenApp.focusGuardThresholdSecs = Math.max(1, Math.round(parsed * 60));
+          localStorage.setItem('study_garden_focus_guard_secs', GardenApp.focusGuardThresholdSecs.toString());
+          updateContinuousFocusProgress();
+          showToast('Focus Guard Updated', `Unlocks after ${parsed} minute(s) of continuous study.`);
+        }
+      }
+    }
+
+    function updateContinuousFocusProgress() {
+      const cur = GardenApp.continuousActiveSecs;
+      const target = Math.max(1, GardenApp.focusGuardThresholdSecs);
+      const targetMins = Math.max(1, Math.round(target / 60));
+      const m = Math.floor(cur / 60); const s = cur % 60;
+      const str = `${m < 10 ? '0' + m : m}m ${s < 10 ? '0' + s : s}s`;
+
+      setElText('continuousFocusLabel', str);
+      const pct = Math.min(100, (cur / target) * 100);
+      const bar = document.getElementById('focusGuardProgressBar');
+      if (bar) bar.style.width = `${pct}%`;
+      const tMin = Math.floor(target / 60);
+      const tSec = target % 60;
+      const targetClock = `${tMin < 10 ? '0' + tMin : tMin}:${tSec < 10 ? '0' + tSec : tSec}`;
+      setElText('focusGuardCountdownText', `${formatClockTime(cur)} / ${targetClock} Continuous`);
+      setElText('guardTargetMinsLabel', `${targetMins}m`);
+      setElText('deskModeContinuousVal', str);
+
+      if (cur >= target) {
+        if (GardenApp.focusGuardLocked) unlockFocusGuard();
+      } else if (!GardenApp.focusGuardLocked) {
+        relockFocusGuard();
+      }
+    }
+
+    function unlockFocusGuard() {
+      GardenApp.focusGuardLocked = false;
+      const badge = document.getElementById('focusGuardStateBadge');
+      const icon = document.getElementById('focusGuardIcon');
+      const cont = document.getElementById('breakDirectoryContainer');
+      if (badge) {
+        badge.innerText = 'Focus Guard: UNLOCKED';
+        badge.className = 'text-[11px] font-black font-mono tracking-wider text-court-light';
+      }
+      if (icon) icon.className = 'fa-solid fa-lock-open text-court-light text-xs';
+      if (cont) {
+        cont.classList.remove('focus-guard-locked');
+        cont.classList.add('focus-guard-unlocked');
+      }
+      setElText('focusGuardSubtext', 'Target reached. Breath, music, and rest portals are open.');
+      showToast('Focus Guard Unlocked!', 'Relaxation directory is now available.', 'fa-trophy');
+    }
+
+    function relockFocusGuard() {
+      GardenApp.focusGuardLocked = true;
+      const badge = document.getElementById('focusGuardStateBadge');
+      const icon = document.getElementById('focusGuardIcon');
+      const cont = document.getElementById('breakDirectoryContainer');
+      if (badge) {
+        badge.innerText = 'Focus Guard: LOCKED';
+        badge.className = 'text-[11px] font-black font-mono tracking-wider text-court-accent';
+      }
+      if (icon) icon.className = 'fa-solid fa-lock text-court-accent text-xs';
+      if (cont) {
+        cont.classList.remove('focus-guard-unlocked');
+        cont.classList.add('focus-guard-locked');
+      }
+      setElText('focusGuardSubtext', 'Directory remains locked until continuous study reaches the time mark.');
+    }
+
+    function devFastForwardLock() {
+      GardenApp.continuousActiveSecs = GardenApp.focusGuardThresholdSecs;
+      updateContinuousFocusProgress();
+      for (let i = 0; i < 30; i++) addHeatmapMinute();
+      showToast('Dev Fast-Forward', 'Simulated continuous study target completion.');
+    }
+
+    function launchRelaxationPortal(name, url) {
+      if (GardenApp.focusGuardLocked) {
+        showToast('Focus Guard Locked', `Requires continuous study on timer (${document.getElementById('focusGuardCountdownText').innerText})`, 'fa-lock');
+        return;
+      }
+      window.open(url, '_blank');
+    }
+
+    // --- GEMINI VISION AI AUDIT ---
+    function openGeminiModal() {
+      const savedKey = localStorage.getItem('study_garden_gemini_key') || '';
+      document.getElementById('geminiApiKeyInput').value = savedKey;
+      document.getElementById('geminiModal').classList.remove('hidden');
+    }
+    function closeGeminiModal() { document.getElementById('geminiModal').classList.add('hidden'); }
+
+    const AUDIT_PROMPT = 'Act as an expert ergonomic and study surveillance AI. Analyze this webcam study frame. Provide a concise 3-bullet assessment: 1. User Posture & Neck Tilt, 2. Gaze Focus & Eye Contact, 3. Fatigue / Ergonomic Recommendation.';
+    const AUDIT_SYSTEM = 'You are a careful ergonomics and study-habits assistant. Only describe what is visible in the image. If no person is visible, say so plainly. Keep it to three short bullets.';
+
+    async function executeGeminiAuditFromModal() {
+      const apiKey = document.getElementById('geminiApiKeyInput').value.trim();
+      try {
+        if (apiKey) localStorage.setItem(GEMINI_KEY_STORAGE, apiKey); else localStorage.removeItem(GEMINI_KEY_STORAGE);
+      } catch (e) {}
+      tutorModel = null;
+      const resBox = document.getElementById('geminiAuditResultBox');
+      resBox.classList.remove('hidden');
+
+      if (!apiKey) {
+        resBox.innerText = 'Capturing frame and running the demo audit...';
+        setTimeout(() => {
+          resBox.innerText = `🤖 Gemini Vision Audit (Demo Mode, no API key entered):\n\n• Posture: Cervical spine alignment within normal range. Upright desk seating.\n• Gaze & Focus: Direct screen focus confirmed.\n• Fatigue Index: Low. Add a Gemini API key above for a real analysis of your camera frame.`;
+        }, 600);
+        return;
+      }
+      if (!GardenApp.isWebcamStreaming) {
+        resBox.innerText = 'Turn on "Enable Live Camera" first, so there is a real frame for Gemini to look at. Then press Capture Frame & Analyze again.';
+        return;
+      }
+
+      resBox.innerText = 'Capturing frame and querying Gemini Vision AI...';
+      const video = document.getElementById('webcamElement');
+      const snap = document.createElement('canvas');
+      snap.width = video.videoWidth || 640; snap.height = video.videoHeight || 480;
+      snap.getContext('2d').drawImage(video, 0, 0, snap.width, snap.height);
+      const base64Jpeg = snap.toDataURL('image/jpeg', 0.8).split(',')[1];
+      try {
+        const reply = await callGemini(
+          [{ role: 'user', parts: [{ text: AUDIT_PROMPT }, { inlineData: { mimeType: 'image/jpeg', data: base64Jpeg } }] }],
+          AUDIT_SYSTEM
+        );
+        resBox.innerText = `🤖 Gemini AI Ergonomic Audit:\n\n${reply}`;
+      } catch (err) {
+        resBox.innerText = `Gemini audit failed: ${err.message || 'unknown error'}\n\nTip: check the API key, then try again.`;
+      }
+    }
+    function runGeminiPostureAudit() { openGeminiModal(); }
+
+    // --- TIMER ENGINE & ACCUMULATION ---
+    const HEATMAP_KEY = 'study_garden_heatmap_v2';
+    let focusSecondAccumulator = 0;
+
+    // Returns the 24x30 grid currently being displayed: 'Overall' sums every subject's minutes per cell
+    function getActiveHeatmapGrid() {
+      if (GardenApp.heatmapView === 'Overall') {
+        const summed = Array.from({ length: 24 }, () => Array(30).fill(0));
+        GardenApp.subjectsList.forEach(s => {
+          const g = GardenApp.matrixGridBySubject[s.name];
+          if (!g) return;
+          for (let h = 0; h < 24; h++) {
+            for (let d = 0; d < 30; d++) summed[h][d] += (g[h][d] || 0);
+          }
+        });
+        return summed;
+      }
+      return GardenApp.matrixGridBySubject[GardenApp.heatmapView] || Array.from({ length: 24 }, () => Array(30).fill(0));
+    }
+
+    function selectHeatmapView(view) {
+      GardenApp.heatmapView = view;
+      renderHeatmapSubjectTabs();
+      renderMatrixGridDOM();
+      recalculateAnalyticsMetrics();
+    }
+
+    function renderHeatmapSubjectTabs() {
+      const cont = document.getElementById('heatmapSubjectTabs');
+      if (!cont) return;
+      const activeCls = 'px-2.5 py-1.5 rounded-lg text-[11px] font-bold bg-court-lawn text-white border border-court-dark whitespace-nowrap shadow-2xs transition';
+      const inactiveCls = 'px-2.5 py-1.5 rounded-lg text-[11px] font-semibold bg-white text-court-deep border border-court-border hover:bg-court-tint whitespace-nowrap transition';
+      let html = `<button data-view="Overall" onclick="selectHeatmapView('Overall')" class="${GardenApp.heatmapView === 'Overall' ? activeCls : inactiveCls}">🌐 Overall</button>`;
+      GardenApp.subjectsList.forEach(s => {
+        html += `<button data-view="${s.name}" onclick="selectHeatmapView('${s.name}')" class="${GardenApp.heatmapView === s.name ? activeCls : inactiveCls}">${s.icon} ${s.name}</button>`;
+      });
+      cont.innerHTML = html;
+    }
+
+    function currentHourKey(date = new Date()) {
+      return `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}-${date.getHours()}`;
+    }
+
+    function heatmapDayIndex(date = new Date()) {
+      return Math.min(29, Math.max(0, date.getDate() - 1));
+    }
+
+    function persistHeatmap() {
+      try {
+        const now = new Date();
+        localStorage.setItem(HEATMAP_KEY, JSON.stringify({
+          year: now.getFullYear(),
+          month: now.getMonth(),
+          gridsBySubject: GardenApp.matrixGridBySubject
+        }));
+      } catch (e) {}
+    }
+
+    function loadPersistedHeatmap() {
+      try {
+        const raw = localStorage.getItem(HEATMAP_KEY);
+        if (!raw) return false;
+        const parsed = JSON.parse(raw);
+        const now = new Date();
+        if (parsed.year !== now.getFullYear() || parsed.month !== now.getMonth()) return false;
+        if (parsed.gridsBySubject) {
+          GardenApp.subjectsList.forEach(s => {
+            const g = parsed.gridsBySubject[s.name];
+            if (Array.isArray(g) && g.length === 24) {
+              GardenApp.matrixGridBySubject[s.name] = g;
+            }
+          });
+          return true;
+        }
+      } catch (e) {}
+      return false;
+    }
+
+    // Adds one studied minute to the ACTIVE subject's grid (subject is chosen via the subject pills / selectStudySubject)
+    function addHeatmapMinute(date = new Date()) {
+      const d = heatmapDayIndex(date);
+      const h = date.getHours();
+      const subject = GardenApp.activeSubject;
+      const grid = GardenApp.matrixGridBySubject[subject];
+      if (!grid || !grid[h]) return;
+      grid[h][d] = Math.min(60, (grid[h][d] || 0) + 1);
+      persistHeatmap();
+      renderMatrixGridDOM();
+      recalculateAnalyticsMetrics();
+    }
+
+    function maybeResetHourlyStudyClock(date = new Date()) {
+      const key = currentHourKey(date);
+      if (!GardenApp.studyHourKey) {
+        GardenApp.studyHourKey = key;
+        return;
+      }
+      if (GardenApp.studyHourKey !== key) {
+        GardenApp.studyHourKey = key;
+        GardenApp.studyElapsedSecs = 0;
+        GardenApp.heatmapSecondBucket = 0;
+        renderBigTimerDigits();
+        showToast('Hourly Reset', 'Study clock reset for the new hour. Heatmap continues by date & time.');
+      }
+    }
+
+    function renderBigTimerDigits() {
+      const formatted = formatClockTime(GardenApp.studyElapsedSecs);
+      setElText('timerDisplayDigits', formatted);
+      setElText('deskModeTimerDigits', formatted);
+    }
+
+    function onStudyTimerTick() {
+      const now = new Date();
+      maybeResetHourlyStudyClock(now);
+
+      GardenApp.studyElapsedSecs++;
+      if (GardenApp.studyElapsedSecs >= 3600) {
+        GardenApp.studyElapsedSecs = 0;
+      }
+      GardenApp.continuousActiveSecs++;
+      GardenApp.todayStudySeconds++;
+      GardenApp.heatmapSecondBucket++;
+      updateContinuousFocusProgress();
+      updateStudyTimelineLive();
+      renderBigTimerDigits();
+
+      if (GardenApp.heatmapSecondBucket >= 60) {
+        GardenApp.heatmapSecondBucket = 0;
+        addHeatmapMinute(now);
+      }
+    }
+
+    function formatClockTime(sec) {
+      const safe = Math.max(0, Math.floor(sec || 0));
+      const h = Math.floor(safe / 3600);
+      const m = Math.floor((safe % 3600) / 60);
+      const s = safe % 60;
+      if (h > 0) {
+        return `${h}:${m < 10 ? '0' + m : m}:${s < 10 ? '0' + s : s}`;
+      }
+      return `${m < 10 ? '0' + m : m}:${s < 10 ? '0' + s : s}`;
+    }
+
+    function updatePausedBreakDisplay() {
+      const m = Math.floor(GardenApp.pausedBreakSecs / 60); const s = GardenApp.pausedBreakSecs % 60;
+      setElText('pausedBreakTimeDisplay', `${m < 10 ? '0' + m : m}m ${s < 10 ? '0' + s : s}s`);
+    }
+
+    function startPauseTracker() {
+      if (!GardenApp.pauseTrackerInterval) {
+        GardenApp.pauseTrackerInterval = setInterval(() => {
+          GardenApp.pausedBreakSecs++;
+          updatePausedBreakDisplay();
+        }, 1000);
+      }
+    }
+    function stopPauseTracker() {
+      if (GardenApp.pauseTrackerInterval) {
+        clearInterval(GardenApp.pauseTrackerInterval);
+        GardenApp.pauseTrackerInterval = null;
+      }
+    }
+
+    function startStudyTicker() {
+      if (GardenApp.timerInterval) clearInterval(GardenApp.timerInterval);
+      GardenApp.timerInterval = setInterval(() => {
+        if (!GardenApp.isTimerRunning) return;
+        onStudyTimerTick();
+      }, 1000);
+    }
+
+    function stopStudyTicker() {
+      if (GardenApp.timerInterval) {
+        clearInterval(GardenApp.timerInterval);
+        GardenApp.timerInterval = null;
+      }
+    }
+
+    function toggleTimerRunningState() {
+      if (GardenApp.isTimerRunning) {
+        GardenApp.isTimerRunning = false;
+        stopStudyTicker();
+        setElClass('timerActionIcon', 'fa-solid fa-play text-court-accent');
+        setElText('timerActionLabel', 'Resume Focus');
+        setElText('sessionStatusLabel', 'SESSION PAUSED');
+        setElClass('sessionStatusDot', 'w-2 h-2 rounded-full bg-yellow-500');
+        setElText('peerUserLiveStatus', '☕ Paused');
+        setElClass('peerUserLiveStatus', 'text-[9px] text-amber-600 font-bold');
+        setElText('timerStatusDescription', 'Study paused • Rest clock running');
+        startPauseTracker();
+        showToast('Session Paused', 'Study clock paused. Rest time is counting.');
+      } else {
+        stopPauseTracker();
+        GardenApp.isTimerRunning = true;
+        GardenApp.timerMode = 'focus';
+        maybeResetHourlyStudyClock();
+        setElClass('timerActionIcon', 'fa-solid fa-pause text-court-accent');
+        setElText('timerActionLabel', 'Pause Session');
+        setElText('sessionStatusLabel', 'ACTIVE FOCUS SESSION');
+        setElClass('sessionStatusDot', 'w-2 h-2 rounded-full bg-court-light animate-ping');
+        setElText('peerUserLiveStatus', '● Studying Live');
+        setElClass('peerUserLiveStatus', 'text-[9px] text-court-lawn font-bold');
+        setElText('timerStatusDescription', 'Study clock running • Heatmap filling by date & hour');
+        startStudyTicker();
+        showToast('Session Started', 'Study time is running. Pause to start rest time.');
+      }
+    }
+
+    function setTimerMode(mode) {
+      GardenApp.timerMode = mode;
+      const bF = document.getElementById('btnModeFocus'); const bB = document.getElementById('btnModeBreak');
+      if (mode === 'focus') {
+        if (bF) bF.className = 'px-3 py-1 rounded-lg text-xs font-bold bg-court-lawn text-white shadow-xs transition';
+        if (bB) bB.className = 'px-3 py-1 rounded-lg text-xs font-bold text-court-dark hover:text-court-lawn transition';
+        setElText('timerStatusDescription', 'Study clock • Resets each hour • Heatmap by date & time');
+        if (!GardenApp.isTimerRunning) stopPauseTracker();
+      } else {
+        if (bB) bB.className = 'px-3 py-1 rounded-lg text-xs font-bold bg-court-lawn text-white shadow-xs transition';
+        if (bF) bF.className = 'px-3 py-1 rounded-lg text-xs font-bold text-court-dark hover:text-court-lawn transition';
+        setElText('timerStatusDescription', 'Rest break • Small rest clock running');
+        if (GardenApp.isTimerRunning) toggleTimerRunningState();
+        else startPauseTracker();
+      }
+      renderBigTimerDigits();
+    }
+
+    function triggerImmediateBreak() {
+      setTimerMode('break');
+      showToast('Break Initiated', 'Study clock paused. Rest time is counting.');
+    }
+
+    function resetTimerSession(resetContinuous = false) {
+      GardenApp.isTimerRunning = false;
+      stopStudyTicker();
+      stopPauseTracker();
+      GardenApp.studyElapsedSecs = 0;
+      GardenApp.heatmapSecondBucket = 0;
+      GardenApp.studyHourKey = currentHourKey();
+      renderBigTimerDigits();
+      setElClass('timerActionIcon', 'fa-solid fa-play text-court-accent');
+      setElText('timerActionLabel', 'Start Focus Session');
+      setElText('sessionStatusLabel', 'READY TO FOCUS');
+      setElClass('sessionStatusDot', 'w-2.5 h-2.5 rounded-full bg-court-light animate-pulse');
+      setElText('timerStatusDescription', 'Study clock • Resets each hour • Heatmap by date & time');
+      if (resetContinuous) {
+        GardenApp.continuousActiveSecs = 0;
+        GardenApp.pausedBreakSecs = 0;
+        updatePausedBreakDisplay();
+        updateContinuousFocusProgress();
+      }
+    }
+
+    // --- 30x24 MATRIX LOGIC ---
+    function getCellColorData(mins) {
+      if (mins === 0) return { bg: '#f4f5ef', text: '#b5b8ae', border: 'border-court-border/70', weight: 'font-normal' };
+      if (mins <= 15) return { bg: '#c8dcda', text: '#3e5856', border: 'border-court-line', weight: 'font-semibold' };
+      if (mins <= 35) return { bg: '#c7d2c1', text: '#3a4937', border: 'border-court-soft', weight: 'font-bold' };
+      if (mins <= 50) return { bg: '#a5bda1', text: '#2b3a29', border: 'border-court-light', weight: 'font-extrabold' };
+      return { bg: '#778673', text: '#ffffff', border: 'border-court-lawn', weight: 'font-black' };
+    }
+
+    function initFreshMatrixGrid() {
+      if (!loadPersistedHeatmap()) {
+        GardenApp.subjectsList.forEach(s => {
+          GardenApp.matrixGridBySubject[s.name] = Array.from({ length: 24 }, () => Array(30).fill(0));
+        });
+      }
+      renderHeatmapSubjectTabs();
+      renderMatrixGridDOM();
+      recalculateAnalyticsMetrics();
+    }
+
+    function renderMatrixGridDOM() {
+      const tbody = document.getElementById('matrixGridTableBody');
+      if (!tbody) return;
+      const activeGrid = getActiveHeatmapGrid();
+      let html = '';
+      const todayDate = new Date().getDate(); const currentHour = new Date().getHours();
+      for (let h = 0; h < 24; h++) {
+        const hourStr = (h < 10 ? '0' + h : h) + ':00';
+        let rowSumMins = 0;
+        html += `<tr class="hover:bg-court-tint/40 transition-colors"><td class="sticky-col bg-white border-r border-court-border px-2.5 py-1 text-[11px] font-sans font-bold text-court-dark">${hourStr}</td>`;
+        for (let d = 0; d < 30; d++) {
+          const mins = activeGrid[h][d];
+          rowSumMins += mins;
+          const colorData = getCellColorData(mins);
+          const isLive = ((d + 1) === todayDate && h === currentHour);
+          const ring = isLive ? 'ring-2 ring-court-accent z-10' : '';
+          html += `<td class="p-0.5 border-r border-court-border/40"><div onclick="manuallyEditCellPrompt(${h}, ${d})" style="background-color: ${colorData.bg}; color: ${colorData.text};" class="matrix-cell rounded-md mx-auto flex items-center justify-center transition-all cursor-pointer hover:scale-125 border ${colorData.border} ${colorData.weight} ${ring}">${mins}</div></td>`;
+        }
+        html += `<td class="sticky-col-right bg-court-surface px-2.5 py-1 text-center font-mono font-bold text-court-dark border-l border-court-border text-[11px]">${(rowSumMins / 60).toFixed(1)}h</td></tr>`;
+      }
+      tbody.innerHTML = html;
+      updateColumnDaySums();
+    }
+
+    function updateColumnDaySums() {
+      const activeGrid = getActiveHeatmapGrid();
+      let grandTotalMins = 0;
+      for (let d = 0; d < 30; d++) {
+        let colSum = 0;
+        for (let h = 0; h < 24; h++) colSum += activeGrid[h][d];
+        grandTotalMins += colSum;
+        const c = document.getElementById(`day-sum-${d + 1}`);
+        if (c) c.innerText = colSum > 60 ? (colSum / 60).toFixed(1) + 'h' : colSum + 'm';
+      }
+      const g = document.getElementById('grandMonthTotalCell');
+      if (g) g.innerText = (grandTotalMins / 60).toFixed(1) + 'h';
+    }
+
+    function manuallyEditCellPrompt(hour, dayIdx) {
+      if (GardenApp.heatmapView === 'Overall') {
+        showToast('Select a Subject', 'Switch to a specific subject tab above to manually edit its minutes.', 'fa-circle-info');
+        return;
+      }
+      const grid = GardenApp.matrixGridBySubject[GardenApp.heatmapView];
+      const cur = grid[hour][dayIdx];
+      const res = prompt(`Set studied minutes for ${GardenApp.heatmapView} on Day ${dayIdx + 1} at ${hour}:00 (0-60):`, cur);
+      if (res !== null) {
+        const val = parseInt(res, 10);
+        if (!isNaN(val) && val >= 0 && val <= 60) {
+          grid[hour][dayIdx] = val;
+          persistHeatmap();
+          renderMatrixGridDOM(); recalculateAnalyticsMetrics();
+        }
+      }
+    }
+
+    function setMatrixCellSize(size) {
+      GardenApp.matrixCellSize = size;
+      document.getElementById('matrixGridWrapper').className = `matrix-${size} min-w-max`;
+      ['micro', 'standard', 'comfort'].forEach(s => {
+        const b = document.getElementById(`sizeBtn${s.charAt(0).toUpperCase() + s.slice(1)}`);
+        b.className = (s === size) ? 'px-2.5 py-1 rounded-lg bg-court-lawn text-white font-bold text-[11px] transition shadow-xs' : 'px-2.5 py-1 rounded-lg text-court-dark hover:text-court-lawn font-medium text-[11px] transition';
+      });
+    }
+
+    function simulateMonthReset() {
+      if (confirm('Reset entire 30-Day Matrix (overall + every subject) back to fresh 0m state?')) {
+        GardenApp.subjectsList.forEach(s => {
+          GardenApp.matrixGridBySubject[s.name] = Array.from({ length: 24 }, () => Array(30).fill(0));
+        });
+        persistHeatmap();
+        renderMatrixGridDOM();
+        recalculateAnalyticsMetrics();
+        showToast('Matrix Cleared', 'All 30 × 24 study grid cells reset to 0 minutes.', 'fa-arrow-rotate-left');
+      }
+    }
+
+    function simulateFullMonthData() {
+      // Distribute a random total across all subjects for each cell, so both Overall and subject views fill in
+      GardenApp.subjectsList.forEach(s => { GardenApp.matrixGridBySubject[s.name] = Array.from({ length: 24 }, () => Array(30).fill(0)); });
+      for (let d = 0; d < 30; d++) {
+        for (let h = 0; h < 24; h++) {
+          if (h >= 9 && h <= 18 && Math.random() > 0.25) {
+            const total = Math.floor(15 + Math.random() * 45);
+            const subject = GardenApp.subjectsList[Math.floor(Math.random() * GardenApp.subjectsList.length)].name;
+            GardenApp.matrixGridBySubject[subject][h][d] = total;
+          }
+        }
+      }
+      renderMatrixGridDOM(); recalculateAnalyticsMetrics(); persistHeatmap();
+      showToast('Month Data Simulated', 'Realistic 30-day study distribution generated across subjects.');
+    }
+
+    function recalculateAnalyticsMetrics() {
+      const activeGrid = getActiveHeatmapGrid();
+      let totalMins = 0; const hTotals = Array(24).fill(0); const dTotals = Array(30).fill(0);
+      for (let h = 0; h < 24; h++) {
+        for (let d = 0; d < 30; d++) {
+          const v = activeGrid[h][d];
+          totalMins += v; hTotals[h] += v; dTotals[d] += v;
+        }
+      }
+      document.getElementById('metricMonthlyTotal').innerText = `${(totalMins / 60).toFixed(1)} Hours`;
+      document.getElementById('metricDailyAverage').innerText = `${(totalMins / 30).toFixed(1)} Min / Day`;
+      let maxH = -1; let maxHV = 0;
+      for (let h = 0; h < 24; h++) { if (hTotals[h] > maxHV) { maxHV = hTotals[h]; maxH = h; } }
+      document.getElementById('metricPeakHour').innerText = maxH >= 0 && maxHV > 0 ? `${maxH < 10 ? '0' + maxH : maxH}:00 (${(maxHV / 60).toFixed(1)}h)` : 'None (Fresh)';
+      let maxD = -1; let maxDV = 0;
+      for (let d = 0; d < 30; d++) { if (dTotals[d] > maxDV) { maxDV = dTotals[d]; maxD = d; } }
+      document.getElementById('metricBestDay').innerText = maxD >= 0 && maxDV > 0 ? `Day ${maxD + 1} (${(maxDV / 60).toFixed(1)}h)` : 'None (Fresh)';
+    }
+
+    // --- AI ACADEMIC DOUBT SOLVER (powered by Gemini) ---
+    const GEMINI_KEY_STORAGE = 'study_garden_gemini_key'; // shared with the Gemini Vision modal
+    // Tried in order; the first one the API recognises is remembered for the session.
+    const GEMINI_TUTOR_MODELS = ['gemini-flash-latest', 'gemini-2.5-flash', 'gemini-2.0-flash'];
+    const TUTOR_SYSTEM_PROMPT = [
+      'You are Study Garden Tutor, a patient and accurate academic tutor for school and university students.',
+      'Solve the student\'s doubt correctly and explain it clearly.',
+      'For a problem: restate what is asked in one line, solve it step by step showing the working, then give the final answer on its own line starting with "Answer:".',
+      'For a concept: give a short intuitive explanation, the key points, then one small worked example.',
+      'Double-check calculations before answering. If a photo is blurry or a question is ambiguous, say exactly what you could not read and ask one short clarifying question.',
+      'Formatting: light markdown only (**bold** for key terms, numbered steps, bullet lists, no tables, no headings above ###). Write all maths in LaTeX: $...$ inline and $$...$$ for display equations.',
+      'Keep answers focused, under about 350 words unless the problem genuinely needs more. Be encouraging without padding. If asked something unrelated to studying, answer briefly and steer back to studying.'
+    ].join(' ');
+
+    let tutorHistory = [];      // text-only turns sent back to Gemini for context
+    let tutorBusy = false;
+    let tutorModel = null;      // model that last worked
+    let tutorWelcomeHTML = '';
+
+    function getGeminiKey() {
+      try { return (localStorage.getItem(GEMINI_KEY_STORAGE) || '').trim(); } catch (e) { return ''; }
+    }
+
+    function escapeHtml(t) {
+      return String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    function showTutorKeyPanel(show) {
+      const panel = document.getElementById('tutorKeyPanel');
+      if (!panel) return;
+      const willShow = show === undefined ? panel.classList.contains('hidden') : show;
+      panel.classList.toggle('hidden', !willShow);
+      if (willShow) {
+        const inp = document.getElementById('tutorApiKeyInput');
+        inp.value = getGeminiKey();
+        inp.focus();
+      }
+    }
+    function toggleTutorKeyPanel() { showTutorKeyPanel(); }
+
+    function saveTutorApiKey() {
+      const key = document.getElementById('tutorApiKeyInput').value.trim();
+      try {
+        if (key) localStorage.setItem(GEMINI_KEY_STORAGE, key); else localStorage.removeItem(GEMINI_KEY_STORAGE);
+      } catch (e) { showToast('Could Not Save Key', 'Browser storage is blocked, so the key cannot be kept.', 'fa-triangle-exclamation'); return; }
+      const visionInput = document.getElementById('geminiApiKeyInput');
+      if (visionInput) visionInput.value = key;
+      tutorModel = null;
+      showTutorKeyPanel(false);
+      showToast(key ? 'Gemini Key Saved' : 'Gemini Key Removed', key ? 'The tutor is ready. Ask your first doubt.' : 'Add a key to keep using the tutor.', 'fa-key');
+      if (key) document.getElementById('tutorQueryInput').focus();
+    }
+
+    function toggleAiTutorWidget() {
+      const w = document.getElementById('aiTutorWidget');
+      w.classList.toggle('hidden');
+      if (!w.classList.contains('hidden')) {
+        if (!getGeminiKey()) showTutorKeyPanel(true); else document.getElementById('tutorQueryInput').focus();
+      }
+    }
+
+    function clearTutorChat() {
+      if (tutorBusy) return;
+      tutorHistory = [];
+      const h = document.getElementById('tutorChatHistory');
+      if (tutorWelcomeHTML) h.innerHTML = tutorWelcomeHTML;
+    }
+
+    // ---- Gemini request (tries newer model names first, falls back on "model not found") ----
+    async function callGemini(contents, systemPrompt) {
+      const key = getGeminiKey();
+      const models = tutorModel ? [tutorModel] : GEMINI_TUTOR_MODELS;
+      let lastMessage = 'No Gemini model was available for this key.';
+      for (const model of models) {
+        let res;
+        try {
+          res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'x-goog-api-key': key },
+            body: JSON.stringify({
+              systemInstruction: { parts: [{ text: systemPrompt || TUTOR_SYSTEM_PROMPT }] },
+              contents,
+              generationConfig: { temperature: 0.4 }
+            })
+          });
+        } catch (netErr) {
+          const e = new Error('Could not reach Gemini. Check your internet connection and try again.');
+          e.kind = 'network'; throw e;
+        }
+        const data = await res.json().catch(() => ({}));
+        if (res.ok) {
+          const cand = data.candidates && data.candidates[0];
+          const text = cand && cand.content && cand.content.parts
+            ? cand.content.parts.map(p => p.text || '').join('').trim() : '';
+          if (text) { tutorModel = model; return text; }
+          const blocked = data.promptFeedback && data.promptFeedback.blockReason;
+          const e = new Error(blocked
+            ? 'Gemini declined to answer that one. Try rewording the question.'
+            : 'Gemini returned an empty answer. Try asking again or rephrasing.');
+          e.kind = 'empty'; throw e;
+        }
+        const apiMsg = (data.error && data.error.message) || res.statusText || 'Request failed';
+        if (res.status === 404 && models.length > 1) { lastMessage = apiMsg; continue; }
+        const e = new Error(apiMsg);
+        if (res.status === 429) { e.kind = 'quota'; e.message = 'Gemini is rate-limiting this key (free-tier limit reached). Wait a minute and try again.'; }
+        else if (res.status === 401 || res.status === 403 || /api key/i.test(apiMsg)) { e.kind = 'key'; e.message = 'Gemini rejected this API key. Check it and save it again.'; }
+        else if (res.status === 400) { e.kind = 'bad'; e.message = 'Gemini could not process that request: ' + apiMsg; }
+        else { e.kind = 'server'; e.message = 'Gemini had a problem (' + res.status + '). Try again in a moment.'; }
+        throw e;
+      }
+      const e = new Error(lastMessage); e.kind = 'server'; throw e;
+    }
+
+    // ---- Lightweight, HTML-safe markdown + KaTeX renderer for replies ----
+    function renderTutorMarkdown(src) {
+      const stash = [];
+      const hold = (html) => { stash.push(html); return '\u0000' + (stash.length - 1) + '\u0000'; };
+      const math = (tex, display) => {
+        try { if (window.katex) return window.katex.renderToString(tex.trim(), { displayMode: display, throwOnError: false }); } catch (e) {}
+        return '<span class="font-mono">' + escapeHtml(tex.trim()) + '</span>';
+      };
+      let s = String(src).replace(/\r\n/g, '\n');
+      s = s.replace(/```[a-zA-Z0-9]*\n?([\s\S]*?)```/g, (_, c) => hold('<pre class="tutor-code">' + escapeHtml(c.replace(/\n$/, '')) + '</pre>'));
+      s = s.replace(/`([^`\n]+)`/g, (_, c) => hold('<code class="tutor-inline-code">' + escapeHtml(c) + '</code>'));
+      s = s.replace(/\$\$([\s\S]+?)\$\$/g, (_, t) => hold(math(t, true)));
+      s = s.replace(/\\\[([\s\S]+?)\\\]/g, (_, t) => hold(math(t, true)));
+      s = s.replace(/\\\(([\s\S]+?)\\\)/g, (_, t) => hold(math(t, false)));
+      s = s.replace(/\$(?!\s)([^\n$]*?[^\s\\$])\$(?!\d)/g, (_, t) => hold(math(t, false)));
+      s = escapeHtml(s);
+
+      const inline = (t) => t
+        .replace(/\*\*([^*\n]+?)\*\*/g, '<strong>$1</strong>')
+        .replace(/(^|[^*\w])\*(?!\s)([^*\n]*[^\s*])\*(?!\*)/g, '$1<em>$2</em>');
+
+      const out = []; let para = []; let list = null;
+      const flushPara = () => { if (para.length) { out.push('<p class="mb-2 last:mb-0">' + inline(para.join('<br>')) + '</p>'); para = []; } };
+      const flushList = () => {
+        if (!list) return;
+        const tag = list.type;
+        const startAttr = tag === 'ol' && list.start > 1 ? ' start="' + list.start + '"' : '';
+        const cls = tag === 'ol' ? 'list-decimal' : 'list-disc';
+        out.push('<' + tag + startAttr + ' class="' + cls + ' pl-5 mb-2 space-y-1">' + list.items.map(i => '<li>' + inline(i) + '</li>').join('') + '</' + tag + '>');
+        list = null;
+      };
+      for (const raw of s.split('\n')) {
+        const line = raw.trimEnd(); let m;
+        if (!line.trim()) { flushPara(); flushList(); continue; }
+        if (/^\s*\u0000\d+\u0000\s*$/.test(line)) { flushPara(); flushList(); out.push(line.trim()); continue; }   // code block / display math on its own line
+        if ((m = line.match(/^\s*#{1,6}\s+(.*)$/))) { flushPara(); flushList(); out.push('<div class="font-extrabold text-court-lawn mt-1 mb-1">' + inline(m[1]) + '</div>'); continue; }
+        if (/^\s*(-{3,}|\*{3,})\s*$/.test(line)) { flushPara(); flushList(); out.push('<hr class="my-2 border-court-border">'); continue; }
+        if ((m = line.match(/^\s*[-*\u2022]\s+(.*)$/))) {
+          flushPara(); if (!list || list.type !== 'ul') { flushList(); list = { type: 'ul', items: [] }; }
+          list.items.push(m[1]); continue;
+        }
+        if ((m = line.match(/^\s*(\d+)[.)]\s+(.*)$/))) {
+          flushPara(); if (!list || list.type !== 'ol') { flushList(); list = { type: 'ol', items: [], start: parseInt(m[1], 10) }; }
+          list.items.push(m[2]); continue;
+        }
+        if (list && /^\s{2,}\S/.test(raw)) { list.items[list.items.length - 1] += '<br>' + line.trim(); continue; }
+        flushList(); para.push(line.trim());
+      }
+      flushPara(); flushList();
+      return out.join('').replace(/\u0000(\d+)\u0000/g, (_, i) => stash[+i]);
+    }
+
+    // ---- Chat bubbles ----
+    function appendTutorMessage(sender, text, opts = {}) {
+      const h = document.getElementById('tutorChatHistory');
+      const isU = sender === 'user';
+      const row = document.createElement('div');
+      row.className = 'flex gap-2.5 ' + (isU ? 'justify-end' : 'justify-start');
+      if (!isU) {
+        const av = document.createElement('div');
+        av.className = 'w-7 h-7 rounded-lg bg-court-lawn text-white flex items-center justify-center text-[10px] font-bold shrink-0 shadow-xs';
+        av.innerHTML = '<i class="fa-solid fa-robot"></i>';
+        row.appendChild(av);
+      }
+      const bubble = document.createElement('div');
+      const tone = isU ? 'bg-court-lawn text-white font-medium'
+        : (opts.error ? 'bg-red-50 text-red-800 border border-red-200' : 'bg-white text-court-deep border border-court-border');
+      bubble.className = tone + ' shadow-xs p-3 rounded-2xl text-xs max-w-[85%] min-w-0 leading-relaxed tutor-md';
+      if (isU) {
+        if (opts.imageSrc) {
+          const img = document.createElement('img');
+          img.src = opts.imageSrc; img.alt = 'Uploaded homework photo';
+          img.className = 'rounded-lg mb-2 max-h-40 w-auto border border-white/30';
+          bubble.appendChild(img);
+        }
+        if (text) { const t = document.createElement('div'); t.className = 'whitespace-pre-wrap'; t.textContent = text; bubble.appendChild(t); }
+      } else if (opts.error) {
+        bubble.textContent = text;
+      } else {
+        bubble.innerHTML = renderTutorMarkdown(text);
+      }
+      row.appendChild(bubble);
+      h.appendChild(row); h.scrollTop = h.scrollHeight;
+      return row;
+    }
+
+    function showTutorTyping() {
+      const h = document.getElementById('tutorChatHistory');
+      const row = document.createElement('div');
+      row.id = 'tutorTypingRow'; row.className = 'flex gap-2.5 justify-start';
+      row.innerHTML = '<div class="w-7 h-7 rounded-lg bg-court-lawn text-white flex items-center justify-center text-[10px] font-bold shrink-0 shadow-xs"><i class="fa-solid fa-robot"></i></div>' +
+        '<div class="bg-white border border-court-border shadow-xs px-3.5 py-3 rounded-2xl flex items-center gap-1" aria-label="Tutor is thinking">' +
+        '<span class="w-1.5 h-1.5 rounded-full bg-court-lawn animate-bounce"></span>' +
+        '<span class="w-1.5 h-1.5 rounded-full bg-court-lawn animate-bounce" style="animation-delay:.15s"></span>' +
+        '<span class="w-1.5 h-1.5 rounded-full bg-court-lawn animate-bounce" style="animation-delay:.3s"></span></div>';
+      h.appendChild(row); h.scrollTop = h.scrollHeight;
+    }
+    function hideTutorTyping() { const r = document.getElementById('tutorTypingRow'); if (r) r.remove(); }
+
+    function setTutorBusy(busy) {
+      tutorBusy = busy;
+      const btn = document.getElementById('tutorSendBtn');
+      if (btn) { btn.disabled = busy; btn.classList.toggle('opacity-50', busy); btn.classList.toggle('cursor-not-allowed', busy); }
+    }
+
+    // ---- Core: send a question (and optional photo) to Gemini ----
+    async function askTutor(question, image) {
+      if (tutorBusy) return;
+      appendTutorMessage('user', question, { imageSrc: image ? image.dataUrl : null });
+
+      const parts = [{ text: question }];
+      if (image) parts.push({ inlineData: { mimeType: 'image/jpeg', data: image.base64 } });
+      const contents = tutorHistory.slice(-10).concat([{ role: 'user', parts }]);
+
+      setTutorBusy(true); showTutorTyping();
+      try {
+        const reply = await callGemini(contents);
+        hideTutorTyping();
+        appendTutorMessage('ai', reply);
+        tutorHistory.push({ role: 'user', parts: [{ text: image ? question + ' [a homework photo was attached]' : question }] });
+        tutorHistory.push({ role: 'model', parts: [{ text: reply }] });
+      } catch (err) {
+        hideTutorTyping();
+        appendTutorMessage('ai', err.message || 'Something went wrong. Please try again.', { error: true });
+        if (err.kind === 'key') showTutorKeyPanel(true);
+      } finally {
+        setTutorBusy(false);
+      }
+    }
+
+    function requireGeminiKey() {
+      if (getGeminiKey()) return true;
+      showTutorKeyPanel(true);
+      showToast('Gemini API Key Needed', 'Paste your key in the tutor panel, then ask again.', 'fa-key');
+      return false;
+    }
+
+    function submitTutorQuestion() {
+      if (tutorBusy) return;
+      const inp = document.getElementById('tutorQueryInput');
+      const q = inp.value.trim(); if (!q) return;
+      if (!requireGeminiKey()) return;   // keeps the typed question in the box
+      inp.value = '';
+      askTutor(q, null);
+    }
+
+    function sendQuickPrompt(t) { document.getElementById('tutorQueryInput').value = t; submitTutorQuestion(); }
+
+    function fileToResizedJpeg(file, maxDim = 1600) {
+      return new Promise((resolve, reject) => {
+        const url = URL.createObjectURL(file);
+        const img = new Image();
+        img.onload = () => {
+          const scale = Math.min(1, maxDim / Math.max(img.width, img.height));
+          const c = document.createElement('canvas');
+          c.width = Math.max(1, Math.round(img.width * scale)); c.height = Math.max(1, Math.round(img.height * scale));
+          const ctx = c.getContext('2d'); ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, c.width, c.height);
+          ctx.drawImage(img, 0, 0, c.width, c.height);
+          URL.revokeObjectURL(url);
+          const dataUrl = c.toDataURL('image/jpeg', 0.85);
+          resolve({ dataUrl, base64: dataUrl.split(',')[1] });
+        };
+        img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('That image could not be read. Try a JPG or PNG photo.')); };
+        img.src = url;
+      });
+    }
+
+    async function handleHomeworkPhotoUpload(e) {
+      const file = e.target.files[0];
+      e.target.value = '';               // allow re-selecting the same photo later
+      if (!file || tutorBusy) return;
+      if (!requireGeminiKey()) return;
+      let image;
+      try { image = await fileToResizedJpeg(file); }
+      catch (err) { appendTutorMessage('ai', err.message, { error: true }); return; }
+      const inp = document.getElementById('tutorQueryInput');
+      const typed = inp.value.trim(); inp.value = '';
+      askTutor(typed || 'Read the problem in this photo, then solve it step by step.', image);
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const h = document.getElementById('tutorChatHistory');
+      if (h) tutorWelcomeHTML = h.innerHTML;
+    });
+
+    function startClock() {
+      setInterval(() => {
+        const timeStr = new Date().toLocaleTimeString();
+        const deskClock = document.getElementById('deskModeClockTime');
+        if (deskClock) deskClock.innerText = timeStr;
+      }, 1000);
+    }
+
+    // --- INITIALIZATION ---
+    window.addEventListener('DOMContentLoaded', () => {
+      try {
+        const savedPose = localStorage.getItem('study_garden_pose_baseline');
+        if (savedPose) GardenApp.poseBaseline = JSON.parse(savedPose);
+      } catch (e) {}
+      GardenApp.studyHourKey = currentHourKey();
+      setElText('GoalTargetText', `${GardenApp.dailyStudyGoalHours.toFixed(1)}h`);
+      loadPersistedSubjectsList();
+      renderAllSubjectUI();
+      initFreshMatrixGrid();
+      initLocalFileStorage();
+      renderDDayBadges();
+      initSurveillanceCanvasEngine();
+      initStudyTimeline();
+      renderStudyTasksDOM();
+      updateAttentionScoreDisplay();
+      updateContinuousFocusProgress();
+      renderBigTimerDigits();
+      startClock();
+      setTimeout(() => { showToast('Study Garden Online', 'Start a session, calibrate your pose, then study.'); }, 800);
+    });
+  </script>
+</body>
+</html>
